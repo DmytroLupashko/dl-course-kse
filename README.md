@@ -43,7 +43,7 @@ jupyter lab --port 7766
 1. [] Deep Learning Basics
     1. [x] Deep Learning Overview, PyTorch, Perceptron
         - Author: Volodymyr
-    2. [] Backpropagation & Advanced Optimization
+    2. [x] Backpropagation & Advanced Optimization
         - Author: Volodymyr
     3. [] Validation & Metrics
         - Author: Anton
