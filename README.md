@@ -45,13 +45,13 @@ jupyter lab --port 7766
         - Author: Volodymyr
     2. [x] Backpropagation & Advanced Optimization
         - Author: Volodymyr
-    3. [] Validation & Metrics
+    3. [x] Validation & Metrics
         - Author: Anton
     4. [] Regularization: Dropout, L1/L2, Batch/Layer Normalization
         - Author: Volodymyr
     5. [] Frameworks & Logging: PyTorch Lightning & Weights & Biases
         - Author: Anton
-    6. [] Homework
+    6. [x] Homework
 2. [] Convolutional Neural Networks (CNNs)
     1. [] Intro to Image Processing, Convolutional & Pooling Layers 
         - Author: Volodymyr
