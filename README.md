@@ -47,7 +47,7 @@ jupyter lab --port 7766
         - Author: Volodymyr
     3. [x] Validation & Metrics
         - Author: Anton
-    4. [] Regularization: Dropout, L1/L2, Batch/Layer Normalization
+    4. [x] Regularization: Dropout, L1/L2, Batch/Layer Normalization
         - Author: Volodymyr
     5. [] Frameworks & Logging: PyTorch Lightning & Weights & Biases
         - Author: Anton
