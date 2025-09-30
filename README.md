@@ -49,7 +49,7 @@ jupyter lab --port 7766
         - Author: Anton
     4. [x] Regularization: Dropout, L1/L2, Batch/Layer Normalization
         - Author: Volodymyr
-    5. [] Frameworks & Logging: PyTorch Lightning & Weights & Biases
+    5. [x] Frameworks & Logging: PyTorch Lightning & Weights & Biases
         - Author: Anton
     6. [x] Homework
 2. [] Convolutional Neural Networks (CNNs)
