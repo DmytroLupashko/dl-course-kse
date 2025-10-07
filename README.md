@@ -40,7 +40,7 @@ jupyter lab --port 7766
 
 # Content 
 
-1. [] Deep Learning Basics
+1. [x] Deep Learning Basics
     1. [x] Deep Learning Overview, PyTorch, Perceptron
         - Author: Volodymyr
     2. [x] Backpropagation & Advanced Optimization
@@ -52,8 +52,8 @@ jupyter lab --port 7766
     5. [x] Frameworks & Logging: PyTorch Lightning & Weights & Biases
         - Author: Anton
     6. [x] Homework
-2. [] Convolutional Neural Networks (CNNs)
-    1. [] Intro to Image Processing, Convolutional & Pooling Layers 
+2. [] Convolution Neural Networks (CNNs)
+    1. [x] Intro to Image Processing, Convolution & Pooling Layers 
         - Author: Volodymyr
     2. [] ResNets & EfficientNets
         - Author: Volodymyr
