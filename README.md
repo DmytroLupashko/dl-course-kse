@@ -55,11 +55,11 @@ jupyter lab --port 7766
 2. [] Convolution Neural Networks (CNNs)
     1. [x] Intro to Image Processing, Convolution & Pooling Layers 
         - Author: Volodymyr
-    2. [] ResNets & EfficientNets
+    2. [x] ResNets & EfficientNets
         - Author: Volodymyr
     3. [] CNNs applications for Audio ML
         - Author: Volodymyr
-    4. Homework
+    4. [x] Homework
 3. []  Recurrent Neural Networks (RNNs)
     1. [] Intro to Sequence Tasks, Representations & Embeddings
         - Author: Anton
