@@ -61,11 +61,11 @@ jupyter lab --port 7766
         - Author: Volodymyr
     4. [x] Homework
 3. []  Recurrent Neural Networks (RNNs)
-    1. [] Intro to Sequence Tasks, Representations & Embeddings
+    1. [x] Intro to Sequence Tasks, Representations & Embeddings, Vanilla RNN
         - Author: Anton
-    2. [] RNNs 
+    2. [x] LSTM & GRU, Named Entity Recognition 
         - Author: Anton
-    3. [] GRUs & LSTMs 
+    3. [] TBD 
         - Author: Anton
     4. Homework
 4. [] Transformers
