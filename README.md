@@ -65,7 +65,7 @@ jupyter lab --port 7766
         - Author: Anton
     2. [x] LSTM & GRU, Named Entity Recognition 
         - Author: Anton
-    3. [] TBD 
+    3. [x] StructuredNNs: CT-RNNs, GNNs 
         - Author: Anton
     4. Homework
 4. [] Transformers
