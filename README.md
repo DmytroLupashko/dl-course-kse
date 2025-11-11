@@ -109,7 +109,7 @@ jupyter lab --port 7766
 ```
 @misc{kse_deep_learning,
   author = {Volodymyr Sydorskyi, Anton Bazdyrev},
-  title = {UCU Deep Learning Course},
+  title = {KSE Deep Learning Course},
   year = {2025},
   publisher = {GitHub},
   journal = {GitHub repository},
