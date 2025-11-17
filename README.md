@@ -60,16 +60,16 @@ jupyter lab --port 7766
     3. [x] CNNs applications for Audio ML
         - Author: Volodymyr
     4. [x] Homework
-3. []  Recurrent Neural Networks (RNNs)
+3. [x]  Recurrent Neural Networks (RNNs)
     1. [x] Intro to Sequence Tasks, Representations & Embeddings, Vanilla RNN
         - Author: Anton
     2. [x] LSTM & GRU, Named Entity Recognition 
         - Author: Anton
     3. [x] StructuredNNs: CT-RNNs, GNNs 
         - Author: Anton
-    4. Homework
+    4. [x] Homework
 4. [] Transformers
-    1. [] Attention from Scratch, Encoder Transformer.
+    1. [x] Attention from Scratch, Encoder Transformer.
         - Author: Anton
     2. [] Encoder–Decoder Transformer
         - Author: Anton
