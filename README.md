@@ -71,7 +71,7 @@ jupyter lab --port 7766
 4. [] Transformers
     1. [x] Attention from Scratch, Encoder Transformer.
         - Author: Anton
-    2. [] Encoder–Decoder Transformer
+    2. [x] Encoder–Decoder Transformer
         - Author: Anton
     3. [] Transformers Beyond Text
         - Author: Anton
