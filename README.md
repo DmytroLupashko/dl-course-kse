@@ -73,11 +73,11 @@ jupyter lab --port 7766
         - Author: Anton
     2. [x] Encoder–Decoder Transformer
         - Author: Anton
-    3. [] Transformers Beyond Text
+    3. [x] Transformers Beyond Text
         - Author: Anton
     4. [] Kaggle “Black Magic” Fine-Tuning & Distillation
         - Author: Volodymyr
-    5. Homework
+    5. [x] Homework
 
 # Use Kaggle or Colab for computations
 
