@@ -68,14 +68,14 @@ jupyter lab --port 7766
     3. [x] StructuredNNs: CT-RNNs, GNNs 
         - Author: Anton
     4. [x] Homework
-4. [] Transformers
+4. [x] Transformers
     1. [x] Attention from Scratch, Encoder Transformer.
         - Author: Anton
     2. [x] Encoder–Decoder Transformer
         - Author: Anton
     3. [x] Transformers Beyond Text
         - Author: Anton
-    4. [] Kaggle “Black Magic” Fine-Tuning & Distillation
+    4. [x] Kaggle “Black Magic” Fine-Tuning & Distillation
         - Author: Volodymyr
     5. [x] Homework
 

@@ -48,6 +48,7 @@ requests = "^2.32.5"
 iterative-stratification = "^0.1.9"
 grad-cam = "^1.5.5"
 ttach = "^0.0.3"
+hyperopt = "^0.2.7"
 
 
 [build-system]
