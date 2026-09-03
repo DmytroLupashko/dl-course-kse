@@ -15,8 +15,8 @@
 
 1. Install Poetry using [Poetry full guide](https://python-poetry.org/docs/#installation).
     - The easiest way is to use the [Official Installer guide](https://python-poetry.org/docs/#installing-with-the-official-installer).
-    - Pay attention to `poetry --version`. To install the correct version, run: `curl -sSL https://install.python-poetry.org | python3 - --version 2.1.3`.
-    - If you have already installed another version, simply change it with: `poetry self update 2.1.3`.
+    - Pay attention to `poetry --version`. To install the correct version, run: `curl -sSL https://install.python-poetry.org | python3 - --version 2.4.1`.
+    - If you have already installed another version, simply change it with: `poetry self update 2.4.1`.
 2. Configure Poetry to create Env in local folder - `poetry config virtualenvs.in-project true`.
 3. Activate the environment: `eval $(poetry env activate)`.
     - If you have `conda` and 2 environments were activated: `conda deactivate`.
@@ -29,6 +29,22 @@ In order to activate environment on the next use:
 `eval $(poetry env activate)`
 
 > **Important**: you should be inside your project folder to do it.
+
+### Some hot fixes
+
+#### Module 1 Lecture 1
+
+For 
+
+```python
+make_dot(loss, params=dict(weights=w, bias=b))
+```
+
+Do
+
+```bash
+sudo apt-get update && sudo apt-get install -y graphviz
+```
 
 # Start Jupyter
 
