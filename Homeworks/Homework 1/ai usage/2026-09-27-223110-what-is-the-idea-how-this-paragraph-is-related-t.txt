@@ -1,0 +1,373 @@
+
+❯ <ide_selection>The user selected the lines 75 to 75 from
+  /Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+  Course/Homeworks/Homework 1/human_report.md:
+  Each fold is scored twice: on all rows, as Kaggle scores, and on clean rows
+  without anomalies, which measures the error on real consumption
+  ([season_validation.ipynb](validation/season_validation.ipynb)). This
+  explained the large spread between seasons. On all rows, validation ranges
+  from 1.12 (Oct–Dec) to 1.46 (Jan–Mar), in the same order as the anomaly share
+  (1.1% → 6.1%). On clean rows it's 0.93–1.04 ([season_validation.ipynb,
+  Findings](validation/season_validation.ipynb)). For our final model, of the
+  gap between training (0.83) and validation (1.20), 0.26 is anomaly rows in
+  validation and only 0.11 is season plus memorization
+  ([mean_vs_embedding.ipynb, Findings](validation/mean_vs_embedding.ipynb)).
+
+  This may or may not be related to the current task.</ide_selection>
+
+❯ What is the idea? How this paragraph is related to validation strategy?
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ The idea: the report splits the validation error into two parts. One part
+  comes from bad data, the other from the model actually being wrong.
+
+  The ASHRAE data contains anomalous rows, like long runs of zero readings and
+  broken meters. The metric (RMSLE) punishes these heavily; your EDA shows that
+  predicting 5 for a true 0 costs 1.79. So each fold is scored in two ways:
+
+  - All rows: what Kaggle will actually score, anomalies included.
+  - Clean rows: only real consumption, so it shows how well the model learned
+    the physics.
+
+  What that reveals:
+
+  1. Why the seasons look so different. On all rows, the folds range from 1.12
+     to 1.46, which looks like the model is much worse in winter. On clean rows
+     they're 0.93–1.04, which is nearly flat. The spread follows the share of
+     anomalies in each block (1.1% up to 6.1%), not the season. Jan–Mar isn't
+     harder to predict; it just has more garbage in it.
+  2. The train–val gap is mostly not overfitting. The gap is 0.37 (from 0.83 to
+     1.20), and 0.26 of it comes from anomaly rows in validation. Only 0.11 is
+     real generalization loss from season shift plus memorization. Without this
+     split you might add regularization to fix "overfitting" that barely exists,
+     which fits your finding that regularization didn't help.
+
+  How it connects to the validation strategy: the section before it says how you
+  split the data (four seasonal folds, chosen after adversarial validation).
+  This paragraph says how you read the scores from those folds. The split makes
+  the folds honest about time and weather shift. The two-way scoring keeps data
+  noise from being mistaken for model quality.
+
+  Suggestions for the text:
+  - Define "anomalies" in one clause: what counts and how it's detected.
+  - State which score you use for model selection. Presumably the clean one,
+    with the all-rows score as the leaderboard estimate. The paragraph currently
+    implies this without saying it.
+  - Open with the "why", something like: "Fold scores differed a lot, so we
+    needed to separate data noise from model error." The motivation then comes
+    before the method.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ does "Validation strategy" contains enough info now?
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+⏺ Not yet. The section hasn't changed since we last looked at it. It covers the
+  method, but a reader still can't tell why the first split was dropped or how
+  you used the scores to pick models. The notebooks already have the missing
+  pieces:
+
+  1. Why Jan–Sep / Oct–Dec was dropped. The section gives "AUC 0.92, all from
+     weather" but not what that means. adversarial.ipynb
+     (Homeworks/Homework%201/validation/adversarial.ipynb) says it: that split
+     tests only one season, while the test set spans whole years. Without this,
+     the switch to four folds looks arbitrary.
+  2. The decision rule. This is the most important gap. season_validation.ipynb
+     (Homeworks/Homework%201/validation/season_validation.ipynb) concludes:
+     compare models on clean rows, and also report all rows. The report says
+     each fold is scored twice but never says which score you used to choose
+     models.
+  3. What "anomalies" are, and that they're dropped from training only. Add one
+     clause with a link to EDA §9 (Homeworks/Homework%201/eda/EDA.ipynb). The
+     "training only" part is why the training score (0.83) and the validation
+     score (1.20) aren't directly comparable.
+  4. How folds are combined and the final fit. Folds are compared by mean RMSLE
+     across all four. The final model is retrained on all of 2016 before
+     predicting the test set.
+  5. Noise level. You used one seed per fold, so differences below about 0.01
+     may be noise.
+
+  Other things I noticed:
+  - The "Fails" section says the MLP models and EDA were evaluated with the
+    single split and "should be reevaluated". But adversarial.ipynb, "How to use
+    this" (Homeworks/Homework%201/validation/adversarial.ipynb) says every
+    notebook, from EDA §9 to mlp.ipynb, already uses the four folds. One of
+    these is out of date, so check which and make them agree.
+  - There's a typo: "others(" needs a space before the bracket.
+  - The paragraph at line 78 packs in about five claims. Consider splitting it
+    into "how we score" and "what it showed".
+
+  Items 1–2 are one sentence each and matter most. The rest is polish. I can add
+  these to the section if you'd like.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ Add references for validation strategy. Is it ok now?
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+⏺ Fetch(https://doi.org/10.1111/ecog.02881)
+  ⎿  Received 578 bytes (302 Found)
+
+⏺ Fetch(https://doi.org/10.1016/j.csda.2017.11.003)
+  ⎿  Received 578 bytes (302 Found)
+
+⏺ Fetch(http://fastml.com/adversarial-validation-part-one/)
+  ⎿  Received 14.8KB (200 OK)
+
+⏺ I'm checking that the sources resolve before I add them. All three are real,
+  so I'm adding them now.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(human_report.md)
+  ⎿  Added 1 line, removed 1 line
+      68  
+      69  ### Handout approach (failed)
+      70  
+      71 -First split trained on Jan–Sep and validated on Oct–Dec ([mlp.i
+         -pynb, Data](models/mlp.ipynb)). the problem was that adversaria
+         -l validation showed that these the two parts are told apart wit
+         -h AUC 0.92, all from weather features ([adversarial.ipynb §2](v
+         -alidation/adversarial.ipynb)).                                 
+      71 +First split trained on Jan–Sep and validated on Oct–Dec ([mlp.i
+         +pynb, Data](models/mlp.ipynb)). the problem was that adversaria
+         +l validation showed that these the two parts are told apart wit
+         +h AUC 0.92, all from weather features ([adversarial.ipynb §2](v
+         +alidation/adversarial.ipynb); method: [4](#references), [5](#re
+         +ferences)).                                                    
+      72  
+      73  ### Seasonal 4-Fold
+      74  
+
+⏺ Update(human_report.md)
+  ⎿  Added 1 line, removed 1 line
+      72  
+      73  ### Seasonal 4-Fold
+      74  
+      75 -From then on we used four folds: each holds out one 3-month blo
+         -ck of 2016 and trains on the others([adversarial.ipynb, How to 
+         -use this](validation/adversarial.ipynb)).                      
+      75 +From then on we used four folds: each holds out one 3-month blo
+         +ck of 2016 and trains on the others ([adversarial.ipynb, How to
+         + use this](validation/adversarial.ipynb)). Contiguous blocks in
+         +stead of random rows follow blocked cross-validation for tempor
+         +ally structured data ([6](#references)); training on months aft
+         +er the held-out block is acceptable because the model uses no l
+         +agged targets ([7](#references)).                              
+      76  
+      77  Each fold is scored twice: on all rows, as Kaggle scores, and o
+          n clean rows without anomalies, which measures the error on rea
+          l consumption ([season_validation.ipynb](validation/season_vali
+          dation.ipynb)). This explained the large spread between seasons
+          .
+      78  
+
+⏺ Bash(cd "/Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+      Course/Homeworks/Homework 1" && cat >> human_report.md <<'EOF'
+      4. Z. Zając, "Adversarial validati…)
+  ⎿  Updated human_report.md (+4 -0)
+      87  1. 1st Place Solution in "ASHRAE Great Energy Predictor III" by
+           Isamu & Matt — <https://www.kaggle.com/competitions/ashrae-ene
+          rgy-prediction/writeups/isamu-matt-1st-place-solution-team-isam
+          u-matt>
+      88  2. "1st place solution: Correct Data is All You Need" by Volody
+          myr, "BirdCLEF 2023" competition — <https://www.kaggle.com/comp
+          etitions/birdclef-2023/writeups/volodymyr-1st-place-solution-co
+          rrect-data-is-all-y>
+      89  3. "Sites, buildings identified by internet search" for "ASHRAE
+           Great Energy Predictor III" by Poe Dator — <https://www.kaggle
+          .com/c/ashrae-energy-prediction/discussion/112841>
+      90 +4. Z. Zając, "Adversarial validation, part one", FastML, 2016 —
+         + <http://fastml.com/adversarial-validation-part-one/>          
+      91 +5. Course notebook: [Validation.ipynb §3–5](../../Module_1/Lect
+         +ure_3/Validation.ipynb) (cross-validation schemes and adversari
+         +al validation)                                                 
+      92 +6. D. R. Roberts et al., "Cross-validation strategies for data 
+         +with temporal, spatial, hierarchical, or phylogenetic structure
+         +", *Ecography* 40(8), 2017 — <https://doi.org/10.1111/ecog.0288
+         +1>                                                             
+      93 +7. C. Bergmeir, R. J. Hyndman, B. Koo, "A note on the validity 
+         +of cross-validation for evaluating autoregressive time series p
+         +rediction", *Computational Statistics & Data Analysis* 120, 201
+         +8 — <https://doi.org/10.1016/j.csda.2017.11.003>               
+
+  Ran 1 shell command (ctrl+o to expand)
+  ⎿  Interrupted · What should Claude do instead?
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ I did not mean that by references. Revert it back and add references to the
+  project
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Reverting my changes first.
+
+⏺ Bash(cd "/Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+      Course/Homeworks/Homework 1" && python3 - <<'EOF'
+      p='human_report.md'; s=open(p).read()…)
+  ⎿  Updated human_report.md (+2 -6)
+      68  
+      69  ### Handout approach (failed)
+      70  
+      71 -First split trained on Jan–Sep and validated on Oct–Dec ([mlp.i
+         -pynb, Data](models/mlp.ipynb)). the problem was that adversaria
+         -l validation showed that these the two parts are told apart wit
+         -h AUC 0.92, all from weather features ([adversarial.ipynb §2](v
+         -alidation/adversarial.ipynb); method: [4](#references), [5](#re
+         -ferences)).                                                    
+      71 +First split trained on Jan–Sep and validated on Oct–Dec ([mlp.i
+         +pynb, Data](models/mlp.ipynb)). the problem was that adversaria
+         +l validation showed that these the two parts are told apart wit
+         +h AUC 0.92, all from weather features ([adversarial.ipynb §2](v
+         +alidation/adversarial.ipynb)).                                 
+      72  
+      73  ### Seasonal 4-Fold
+      74  
+      75 -From then on we used four folds: each holds out one 3-month blo
+         -ck of 2016 and trains on the others ([adversarial.ipynb, How to
+         - use this](validation/adversarial.ipynb)). Contiguous blocks in
+         -stead of random rows follow blocked cross-validation for tempor
+         -ally structured data ([6](#references)); training on months aft
+         -er the held-out block is acceptable because the model uses no l
+         -agged targets ([7](#references)).                              
+      75 +From then on we used four folds: each holds out one 3-month blo
+         +ck of 2016 and trains on the others([adversarial.ipynb, How to 
+         +use this](validation/adversarial.ipynb)).                      
+      76  
+      77  Each fold is scored twice: on all rows, as Kaggle scores, and o
+          n clean rows without anomalies, which measures the error on rea
+          l consumption ([season_validation.ipynb](validation/season_vali
+          dation.ipynb)). This explained the large spread between seasons
+          .
+      78  
+     ...
+      87  1. 1st Place Solution in "ASHRAE Great Energy Predictor III" by
+           Isamu & Matt — <https://www.kaggle.com/competitions/ashrae-ene
+          rgy-prediction/writeups/isamu-matt-1st-place-solution-team-isam
+          u-matt>
+      88  2. "1st place solution: Correct Data is All You Need" by Volody
+          myr, "BirdCLEF 2023" competition — <https://www.kaggle.com/comp
+          etitions/birdclef-2023/writeups/volodymyr-1st-place-solution-co
+          rrect-data-is-all-y>
+      89  3. "Sites, buildings identified by internet search" for "ASHRAE
+           Great Energy Predictor III" by Poe Dator — <https://www.kaggle
+          .com/c/ashrae-energy-prediction/discussion/112841>
+      90 -4. Z. Zając, "Adversarial validation, part one", FastML, 2016 —
+         - <http://fastml.com/adversarial-validation-part-one/>          
+      91 -5. Course notebook: [Validation.ipynb §3–5](../../Module_1/Lect
+         -ure_3/Validation.ipynb) (cross-validation schemes and adversari
+         -al validation)                                                 
+      92 -6. D. R. Roberts et al., "Cross-validation strategies for data 
+         -with temporal, spatial, hierarchical, or phylogenetic structure
+         -", *Ecography* 40(8), 2017 — <https://doi.org/10.1111/ecog.0288
+         -1>                                                             
+      93 -7. C. Bergmeir, R. J. Hyndman, B. Koo, "A note on the validity 
+         -of cross-validation for evaluating autoregressive time series p
+         -rediction", *Computational Statistics & Data Analysis* 120, 201
+         -8 — <https://doi.org/10.1016/j.csda.2017.11.003>               
+
+⏺ Reverted. Now I'm adding links to the project's own files.
+
+⏺ Bash(cd "/Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+      Course/Homeworks/Homework 1" && python3 - <<'EOF'
+      p='human_report.md'; s=open(p).read()…)
+  ⎿  Updated human_report.md (+2 -2)
+      72  
+      73  ### Seasonal 4-Fold
+      74  
+      75 -From then on we used four folds: each holds out one 3-month blo
+         -ck of 2016 and trains on the others([adversarial.ipynb, How to 
+         -use this](validation/adversarial.ipynb)).                      
+      75 +From then on we used four folds: each holds out one 3-month blo
+         +ck of 2016 and trains on the others([adversarial.ipynb, How to 
+         +use this](validation/adversarial.ipynb)); folds are defined in 
+         +[ashrae/config.py](ashrae/config.py#L19)). All tuning notebooks
+         + compare models by mean RMSLE over these folds ([epochs_test.ip
+         +ynb](models/epochs_test.ipynb), [optimizers_test.ipynb](models/
+         +optimizers_test.ipynb), [regularization_test.ipynb](models/regu
+         +larization_test.ipynb)).                                       
+      76  
+      77 -Each fold is scored twice: on all rows, as Kaggle scores, and o
+         -n clean rows without anomalies, which measures the error on rea
+         -l consumption ([season_validation.ipynb](validation/season_vali
+         -dation.ipynb)). This explained the large spread between seasons
+         -.                                                              
+      77 +Each fold is scored twice: on all rows, as Kaggle scores, and o
+         +n clean rows without anomalies, which measures the error on rea
+         +l consumption ([season_validation.ipynb](validation/season_vali
+         +dation.ipynb)). This explained the large spread between seasons
+         + ([season_validation.ipynb, Findings](validation/season_validat
+         +ion.ipynb); [mean_vs_embedding.ipynb](validation/mean_vs_embedd
+         +ing.ipynb) for the embedding model).                           
+      78  
+      79  ## Fails
+      80  
+
+⏺ That first sentence came out with a doubled bracket, so I'm fixing it.
+
+⏺ Update(human_report.md)
+  ⎿  Added 1 line, removed 1 line
+      72  
+      73  ### Seasonal 4-Fold
+      74  
+      75 -From then on we used four folds: each holds out one 3-month blo
+         -ck of 2016 and trains on the others([adversarial.ipynb, How to 
+         -use this](validation/adversarial.ipynb)); folds are defined in 
+         -[ashrae/config.py](ashrae/config.py#L19)). All tuning notebooks
+         - compare models by mean RMSLE over these folds ([epochs_test.ip
+         -ynb](models/epochs_test.ipynb), [optimizers_test.ipynb](models/
+         -optimizers_test.ipynb), [regularization_test.ipynb](models/regu
+         -larization_test.ipynb)).                                       
+      75 +From then on we used four folds: each holds out one 3-month blo
+         +ck of 2016 and trains on the others ([adversarial.ipynb, How to
+         + use this](validation/adversarial.ipynb); folds are defined in 
+         +[ashrae/config.py](ashrae/config.py#L19)). All tuning notebooks
+         + compare models by mean RMSLE over these folds ([epochs_test.ip
+         +ynb](models/epochs_test.ipynb), [optimizers_test.ipynb](models/
+         +optimizers_test.ipynb), [regularization_test.ipynb](models/regu
+         +larization_test.ipynb)).                                       
+      76  
+      77  Each fold is scored twice: on all rows, as Kaggle scores, and o
+          n clean rows without anomalies, which measures the error on rea
+          l consumption ([season_validation.ipynb](validation/season_vali
+          dation.ipynb)). This explained the large spread between seasons
+           ([season_validation.ipynb, Findings](validation/season_validat
+          ion.ipynb); [mean_vs_embedding.ipynb](validation/mean_vs_embedd
+          ing.ipynb) for the embedding model).
+      78  
+⏺ I reverted my changes, so the outside papers are gone from both the text and
+  the References list. In their place, the section now links to your project's
+  own files. It lives in human_report.md
+  (Homeworks/Homework%201/human_report.md).
+
+  Links added in "Seasonal 4-Fold":
+  - Where the folds are defined: ashrae/config.py:19
+    (Homeworks/Homework%201/ashrae/config.py#L19).
+  - The notebooks that compare models using these folds: epochs_test.ipynb
+    (Homeworks/Homework%201/models/epochs_test.ipynb), optimizers_test.ipynb
+    (Homeworks/Homework%201/models/optimizers_test.ipynb) and
+    regularization_test.ipynb
+    (Homeworks/Homework%201/models/regularization_test.ipynb).
+  - "This explained the large spread between seasons" now points to the Findings
+    in season_validation.ipynb and to mean_vs_embedding.ipynb.
+
+  I also added the missing space in "others(".
+
+  Is it OK now? Almost. The links are fine, but three things are still worth
+  fixing:
+  1. It never says which score you use to pick models. season_validation.ipynb
+     decides to compare on clean rows and also report all rows. The report
+     doesn't say this, and it's one sentence to add.
+  2. Typos in the "Handout approach" sentence: "the problem" should start with a
+     capital, and "these the two parts" has one word too many.
+  3. "Fails" contradicts this section. Its last bullet says the MLP models and
+     EDA were evaluated with the single split and should be reevaluated. But
+     this section says the tuning notebooks all use the four folds. Update or
+     remove that bullet.

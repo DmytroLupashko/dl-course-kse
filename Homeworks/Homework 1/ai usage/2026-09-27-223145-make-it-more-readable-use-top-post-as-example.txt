@@ -1,0 +1,2506 @@
+
+❯ <ide_selection>The user selected the lines 14 to 18 from
+  /Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+  Course/Homeworks/Homework 1/human_report.md:
+  Some readings don't reflect energy use, and training on them (probably)
+  teaches the model that a building can use no power ([EDA
+  §9](eda/EDA.ipynb#broken)). We flag two kinds:
+
+  - Zero electricity: every electricity reading of exactly 0. A building always
+  draws some power, so a zero is a broken meter or a data gap ([EDA
+  §9](eda/EDA.ipynb#broken)).
+  - Off when needed: steam or hot water at 0 for at least a week while the
+  week's mean temperature is below 10 °C, and chilled water the same above 20
+  °C ([EDA §9](eda/EDA.ipynb#broken)).
+
+  This may or may not be related to the current task.</ide_selection>
+
+❯ Make it more readable, use top post as example
+
+  Read 2 files (ctrl+o to expand)
+
+⏺ Update(human_report.md)
+  ⎿  Added 3 lines, removed 3 lines
+      11  
+      12  ### Remove anomalies
+      13  
+      14 -Some readings don't reflect energy use, and training on them (p
+         -robably) teaches the model that a building can use no power ([E
+         -DA §9](eda/EDA.ipynb#broken)). We flag two kinds:              
+      14 +Some readings don't reflect real energy use. Training on them l
+         +ikely teaches the model that a building can use no power at all
+         +. We identified and filtered out two kinds of broken readings (
+         +[EDA §9](eda/EDA.ipynb#broken)):                               
+      15  
+      16 -- **Zero electricity:** every electricity reading of exactly 0.
+         - A building always draws some power, so a zero is a broken mete
+         -r or a data gap ([EDA §9](eda/EDA.ipynb#broken)).              
+      17 -- **Off when needed:** steam or hot water at 0 for at least a w
+         -eek while the week's mean temperature is below 10 °C, and chill
+         -ed water the same above 20 °C ([EDA §9](eda/EDA.ipynb#broken)).
+      16 +- Zero electricity: every electricity reading exactly 0. A buil
+         +ding always draws some power, so a flat zero means a broken met
+         +er or a gap in the data.                                       
+      17 +- Off when needed: steam or hot water stuck at 0 for a week or 
+         +more while that week averaged below 10 °C, or chilled water stu
+         +ck at 0 while it averaged above 20 °C.                         
+      18  
+      19  Together they flag 599,086 rows, 3.0% of the training data ([da
+          ta_aggregation.ipynb §4](preprocessing/data_aggregation.ipynb))
+          .
+      20  We drop them from training only, and keep them when scoring val
+          idation, since Kaggle scores every test row
+
+⏺ Rewrote that section in the plainer, prose-first style of top_post.md —
+  dropped the bold inline labels, moved the citation to a single lead-in, and
+  tightened the two bullets to flat declarative sentences.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ What is the purpose of senseslike "some readings do not reflect ..." bla bla
+  bla, while then we rediscuss it again
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ The intro sentence is trying to state the general rationale for the whole
+  cleanup step (why remove anomalies at all — bad readings would teach a false
+  "zero power is normal" pattern), but then the "Zero electricity" bullet
+  re-justifies the same idea locally ("a building always draws some power,
+  so...") — so you get the reasoning twice, once general and once per-bullet.
+
+  Cleanest fix: state the rationale once, then let the bullets be purely
+  mechanical (what counts as broken), not re-argued.
+
+⏺ Update(human_report.md)
+  ⎿  Added 2 lines, removed 2 lines
+      11  
+      12  ### Remove anomalies
+      13  
+      14 -Some readings don't reflect real energy use. Training on them l
+         -ikely teaches the model that a building can use no power at all
+         -. We identified and filtered out two kinds of broken readings (
+         -[EDA §9](eda/EDA.ipynb#broken)):                               
+      14 +Some readings don't reflect real energy use — a building never 
+         +actually draws zero power, so a flat zero is a broken meter or 
+         +a data gap, and training on it teaches the model that no power 
+         +is a normal state. We identified and filtered out two kinds of 
+         +broken readings ([EDA §9](eda/EDA.ipynb#broken)):              
+      15  
+      16 -- Zero electricity: every electricity reading exactly 0. A buil
+         -ding always draws some power, so a flat zero means a broken met
+         -er or a gap in the data.                                       
+      16 +- Zero electricity: every electricity reading exactly 0.       
+      17  - Off when needed: steam or hot water stuck at 0 for a week or 
+          more while that week averaged below 10 °C, or chilled water stu
+          ck at 0 while it averaged above 20 °C.
+      18  
+      19  Together they flag 599,086 rows, 3.0% of the training data ([da
+          ta_aggregation.ipynb §4](preprocessing/data_aggregation.ipynb))
+          .
+
+⏺ Rationale now lives once in the intro; the bullets are just the two detection
+  rules, no re-justification.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ Recall what rows where removed from training data
+
+⏺ Per the report (line 19), the two anomaly rules together flag 599,086 rows
+  (3.0% of the training data), which are dropped from training only — they're
+  kept when scoring validation, since Kaggle scores every test row.
+
+❯ what issues thos problems had
+
+⏺ Per the report, the flagged rows had one of two problems:
+
+  1. Zero electricity — every electricity reading was exactly 0. Since a
+     building always draws some power, a flat zero indicates a broken meter or a
+     data gap, not real usage.
+  2. Off when needed — steam or hot water read 0 for a week or more while that
+     week's average temperature was below 10 °C, or chilled water read 0 while
+     the average was above 20 °C. In both cases the system should have been
+     running given the weather, so a sustained zero signals a broken/missing
+     reading rather than the building genuinely using no energy.
+
+❯ what 2nd means?
+
+⏺ The second rule ("off when needed") flags heating/cooling meters that stay at
+  0 during weather when they logically should be running:
+
+  - Steam or hot water reading 0 for at least 7 consecutive days, during a week
+    whose average outdoor temperature is below 10 °C. Below that temperature, a
+    building would normally need heating, so a full week of zero heating
+    readings is implausible — it means the meter broke or data is missing, not
+    that heating was truly off.
+  - Chilled water reading 0 for at least 7 consecutive days, during a week whose
+    average outdoor temperature is above 20 °C. Above that temperature, cooling
+    would normally be running, so the same logic applies in reverse.
+
+  So it's not "any single zero reading" — it's a sustained week-long streak of
+  zeros paired with weather that makes that streak physically unlikely.
+
+❯ <ide_selection>The user selected the lines 14 to 23 from
+  /Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+  Course/Homeworks/Homework 1/human_report.md:
+  Some rows had broken energy use, like 0 energy use for some period, spikes,
+  constanst electricity uses for some period of time, etc.
+
+  The decision was to remove zero electricity rows and zero heating rows for
+  cold periods. ([EDA §9](eda/EDA.ipynb#broken))
+
+  Together they flag 599,086 rows, 3.0% of the training data
+  ([data_aggregation.ipynb §4](preprocessing/data_aggregation.ipynb)).
+
+  We drop them from training data only, while validate on all, because kaggle
+  test contains pathological data as well.
+  ([data_aggregation.ipynb §4](preprocessing/data_aggregation.ipynb)).
+
+  With a LightGBM baseline (train Jan–Sep, validate Oct–Dec), dropping zero
+  electricity alone improved RMSLE from 1.385 to 1.196, and both rules together
+  to 1.164 ([EDA §9](eda/EDA.ipynb#broken)).
+
+  This may or may not be related to the current task.</ide_selection>
+
+❯ Does it contain enough information about anomalies preprocessing?
+
+⏺ No — a few things a reader would need are missing or dangling:
+
+  1. Chilled water case is dropped. Line 16 only says "zero heating rows for
+     cold periods," but the actual rule (per your earlier draft and the EDA)
+     also flags chilled water at 0 during warm periods (>20 °C). Right now it
+     reads like only one heating-side check exists.
+  2. No thresholds given. Neither the temperature cutoffs (10 °C / 20 °C) nor
+     the streak length (a week) are stated — "cold periods" is too vague to
+     reproduce the rule.
+  3. Spikes and constant-value anomalies are introduced but never resolved. Line
+     14 says rows had spikes and constant electricity runs too, but line 16
+     only removes zero-electricity and zero-heating rows — it's unclear whether
+     spikes/constant runs were intentionally left untouched, handled elsewhere,
+     or just not mentioned again. As written it reads as a loose thread.
+  4. No definition of what counts as "zero electricity." Is it any single 0, or
+     a streak? (Your earlier draft said "every reading exactly 0" — that
+     distinction matters and is gone now.)
+
+  Everything about impact (599,086 rows, 3.0%, RMSLE 1.385→1.196→1.164,
+  train/validate split rationale) is present and clear. The gap is entirely in
+  the definition of the rules themselves — a reader can't reconstruct the actual
+  filter from this text alone.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ I suppose that this report should focus mainly on the IDEA of how we trained
+  model. What you say (i.e. thresholds, definition of zero electricity, etc)
+  may be relevant in EDA notebook, but not here
+
+⏺ Fair — thresholds and the exact zero-electricity definition are implementation
+  details, and linking to EDA §9 for those is the right call, consistent with
+  the top_post style.
+
+  Two things I flagged aren't detail-level, though, so I'd still raise them:
+
+  1. Chilled water is a whole category of the decision, not a detail. The idea
+     is "we drop zero readings when the season says the meter should be active"
+     — that idea applies to both heating (cold) and cooling (hot) meters. Saying
+     only "zero heating rows for cold periods" misstates the idea itself, not
+     just a missing number.
+  2. Spikes and constant-value runs are introduced as problems, then the
+     decision only covers zero-readings. At the idea level, a reader is left not
+     knowing whether that was a deliberate scope cut ("we found these too, but
+     didn't act on them because…") or an oversight. Even a one-clause resolution
+     would close it.
+
+  Everything else — thresholds, streak length, exact zero definition — I agree
+  belongs in the EDA notebook, not here.
+
+❯ <ide_selection>The user selected the lines 5 to 10 from
+  /Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+  Course/Homeworks/Homework 1/human_report.md:
+  Careful performing of this process was inspired by the following posts:
+  - 1st Place Solution in "ASHRAE Great Energy Predictor III" by Isamu &
+  Matt[https://www.kaggle.com/competitions/ashrae-energy-prediction/writeups/is
+  amu-matt-1st-place-solution-team-isamu-matt]
+  - "1st place solution: Correct Data is All You Need" by Volodymyr for
+  "BirdCLEF 2023" competition. [https://www.kaggle.com/competitions/birdclef-20
+  23/writeups/volodymyr-1st-place-solution-correct-data-is-all-y]
+  - "Sites, buildings identified by internet search" for "ASHRAE Great Energy
+  Predictor III" by Poe Dator
+  [https://www.kaggle.com/c/ashrae-energy-prediction/discussion/112841]
+
+  As a result, it boosted performance of models much more than any other
+  dedicated model engineering. ([mlp.ipynb,
+  Findings](models/mlp.ipynb#follow-up)).
+
+  This may or may not be related to the current task.</ide_selection>
+
+❯ refactor it a bit: i.e. move references to bottom, on the top add them some
+  titles
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Good, the doc already resolved the spikes/chilled-water gaps I raised. Now
+  restructuring the references with footnote-style titles up top and a full list
+  at the bottom.
+
+⏺ Update(human_report.md)
+  ⎿  Added 4 lines, removed 4 lines
+       2  
+       3  ## Preprocessing
+       4  
+       5 -Careful performing of this process was inspired by the followin
+         -g posts:                                                       
+       6 -- 1st Place Solution in "ASHRAE Great Energy Predictor III" by 
+         -Isamu & Matt[https://www.kaggle.com/competitions/ashrae-energy-
+         -prediction/writeups/isamu-matt-1st-place-solution-team-isamu-ma
+         -tt]                                                            
+       7 -- "1st place solution: Correct Data is All You Need" by Volodym
+         -yr for "BirdCLEF 2023" competition. [https://www.kaggle.com/com
+         -petitions/birdclef-2023/writeups/volodymyr-1st-place-solution-c
+         -orrect-data-is-all-y]                                          
+       8 -- "Sites, buildings identified by internet search" for "ASHRAE 
+         -Great Energy Predictor III" by Poe Dator [https://www.kaggle.co
+         -m/c/ashrae-energy-prediction/discussion/112841]                
+       5 +Careful performing of this process was inspired by three prior 
+         +write-ups:                                                     
+       6 +- a data-cleaning methodology from a top ASHRAE solution[^1]   
+       7 +- an anomaly-correction approach from a BirdCLEF competition[^2
+         +]                                                              
+       8 +- site and building identification via internet search[^3]     
+       9  
+      10  As a result, it boosted performance of models much more than an
+          y other dedicated model engineering. ([mlp.ipynb, Findings](mod
+          els/mlp.ipynb#follow-up)).
+      11  
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Now adding a blank line before the list (fixes the lint warning) and appending
+  the References section at the bottom.
+
+⏺ Update(human_report.md)
+  ⎿  Added 1 line
+      3  ## Preprocessing
+      4  
+      5  Careful performing of this process was inspired by three prior w
+         rite-ups:
+      6 +                                                                
+      7  - a data-cleaning methodology from a top ASHRAE solution[^1]
+      8  - an anomaly-correction approach from a BirdCLEF competition[^2]
+      9  - site and building identification via internet search[^3]
+
+⏺ Update(human_report.md)
+  ⎿  Added 6 lines
+      22  ([data_aggregation.ipynb §4](preprocessing/data_aggregation.ipy
+          nb)).
+      23  
+      24  With a LightGBM baseline (train Jan–Sep, validate Oct–Dec), dro
+          pping zero electricity alone improved RMSLE from 1.385 to 1.196
+          , and both rules together to 1.164 ([EDA §9](eda/EDA.ipynb#brok
+          en)).
+      25 +                                                               
+      26 +## References                                                  
+      27 +                                                               
+      28 +[^1]: 1st Place Solution in "ASHRAE Great Energy Predictor III"
+         + by Isamu & Matt — https://www.kaggle.com/competitions/ashrae-e
+         +nergy-prediction/writeups/isamu-matt-1st-place-solution-team-is
+         +amu-matt                                                       
+      29 +[^2]: "1st place solution: Correct Data is All You Need" by Vol
+         +odymyr, "BirdCLEF 2023" competition — https://www.kaggle.com/co
+         +mpetitions/birdclef-2023/writeups/volodymyr-1st-place-solution-
+         +correct-data-is-all-y                                          
+      30 +[^3]: "Sites, buildings identified by internet search" for "ASH
+         +RAE Great Energy Predictor III" by Poe Dator — https://www.kagg
+         +le.com/c/ashrae-energy-prediction/discussion/112841            
+⏺ Wrapping the bare URLs in the References list to satisfy the linter.
+
+⏺ Update(human_report.md)
+  ⎿  Added 3 lines, removed 3 lines
+      25  
+      26  ## References
+      27  
+      28 -[^1]: 1st Place Solution in "ASHRAE Great Energy Predictor III"
+         - by Isamu & Matt — https://www.kaggle.com/competitions/ashrae-e
+         -nergy-prediction/writeups/isamu-matt-1st-place-solution-team-is
+         -amu-matt                                                       
+      29 -[^2]: "1st place solution: Correct Data is All You Need" by Vol
+         -odymyr, "BirdCLEF 2023" competition — https://www.kaggle.com/co
+         -mpetitions/birdclef-2023/writeups/volodymyr-1st-place-solution-
+         -correct-data-is-all-y                                          
+      30 -[^3]: "Sites, buildings identified by internet search" for "ASH
+         -RAE Great Energy Predictor III" by Poe Dator — https://www.kagg
+         -le.com/c/ashrae-energy-prediction/discussion/112841            
+      28 +[^1]: 1st Place Solution in "ASHRAE Great Energy Predictor III"
+         + by Isamu & Matt — <https://www.kaggle.com/competitions/ashrae-
+         +energy-prediction/writeups/isamu-matt-1st-place-solution-team-i
+         +samu-matt>                                                     
+      29 +[^2]: "1st place solution: Correct Data is All You Need" by Vol
+         +odymyr, "BirdCLEF 2023" competition — <https://www.kaggle.com/c
+         +ompetitions/birdclef-2023/writeups/volodymyr-1st-place-solution
+         +-correct-data-is-all-y>                                        
+      30 +[^3]: "Sites, buildings identified by internet search" for "ASH
+         +RAE Great Energy Predictor III" by Poe Dator — <https://www.kag
+         +gle.com/c/ashrae-energy-prediction/discussion/112841>          
+
+⏺ Done. The intro now names each source's contribution inline with footnote
+  markers ([^1], [^2], [^3]), and the full citations moved to a new "##
+  References" section at the bottom of the file.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ footnote markers do not display correctly in vs code
+
+⏺ VS Code's built-in preview doesn't render [^1] footnote syntax. I'll switch to
+  plain anchor links instead, which work everywhere.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(human_report.md)
+  ⎿  Added 3 lines, removed 3 lines
+       4  
+       5  Careful performing of this process was inspired by three prior 
+          write-ups:
+       6  
+       7 -- a data-cleaning methodology from a top ASHRAE solution[^1]   
+       8 -- an anomaly-correction approach from a BirdCLEF competition[^2
+         -]                                                              
+       9 -- site and building identification via internet search[^3]     
+       7 +- a data-cleaning methodology from a top ASHRAE solution ([1](#
+         +references))                                                   
+       8 +- an anomaly-correction approach from a BirdCLEF competition ([
+         +2](#references))                                               
+       9 +- site and building identification via internet search ([3](#re
+         +ferences))                                                     
+      10  
+      11  As a result, it boosted performance of models much more than an
+          y other dedicated model engineering. ([mlp.ipynb, Findings](mod
+          els/mlp.ipynb#follow-up)).
+      12  
+
+⏺ Now updating the References list to a plain numbered list with explicit
+  anchors, since the old [^1]: footnote defs are now unused.
+
+⏺ Update(human_report.md)
+  ⎿  Added 3 lines, removed 3 lines
+      25  
+      26  ## References
+      27  
+      28 -[^1]: 1st Place Solution in "ASHRAE Great Energy Predictor III"
+         - by Isamu & Matt — <https://www.kaggle.com/competitions/ashrae-
+         -energy-prediction/writeups/isamu-matt-1st-place-solution-team-i
+         -samu-matt>                                                     
+      29 -[^2]: "1st place solution: Correct Data is All You Need" by Vol
+         -odymyr, "BirdCLEF 2023" competition — <https://www.kaggle.com/c
+         -ompetitions/birdclef-2023/writeups/volodymyr-1st-place-solution
+         --correct-data-is-all-y>                                        
+      30 -[^3]: "Sites, buildings identified by internet search" for "ASH
+         -RAE Great Energy Predictor III" by Poe Dator — <https://www.kag
+         -gle.com/c/ashrae-energy-prediction/discussion/112841>          
+      28 +1. 1st Place Solution in "ASHRAE Great Energy Predictor III" by
+         + Isamu & Matt — <https://www.kaggle.com/competitions/ashrae-ene
+         +rgy-prediction/writeups/isamu-matt-1st-place-solution-team-isam
+         +u-matt>                                                        
+      29 +2. "1st place solution: Correct Data is All You Need" by Volody
+         +myr, "BirdCLEF 2023" competition — <https://www.kaggle.com/comp
+         +etitions/birdclef-2023/writeups/volodymyr-1st-place-solution-co
+         +rrect-data-is-all-y>                                           
+      30 +3. "Sites, buildings identified by internet search" for "ASHRAE
+         + Great Energy Predictor III" by Poe Dator — <https://www.kaggle
+         +.com/c/ashrae-energy-prediction/discussion/112841>             
+
+⏺ Fixed — replaced [^1]/[^2]/[^3] footnotes with plain ([1](#references)) links
+  pointing to the ## References heading, and the bottom list is now a normal
+  numbered list. This renders correctly in VS Code's preview (and GitHub too).
+
+❯ <ide_selection>The user selected the lines 26 to 40 from
+  /Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+  Course/Homeworks/Homework 1/human_report.md:
+  Removed features
+
+  Some features just were not appropriate for training model:
+  - floor count which is missing for 83% of rows (data_aggregation.ipynb §3)
+  - precipitation and cloud coverage, which barely relate to the target and are
+  often missing (EDA §7)
+
+  Interpolated features
+
+  - year_built, filled with the training median, plus a missing flag: it is
+  missing for 60% of rows (data_aggregation.ipynb §3, mlp.ipynb, Features).
+  - Weather: air and dew temperature, sea-level pressure, wind speed, and wind
+  direction as sin/cos (mlp.ipynb, Features). Temperature pushes chilled water
+  up (ρ = 0.43) and steam and hot water down (ρ ≈ −0.45), so the model has to
+  combine meter type with weather (EDA §7).
+
+  Feature Engineering
+
+  - Cyclic encoding of hour and day of week (sin/cos), from local time
+  ([mlp.ipynb, Features](models/mlp.ipynb)). Use is
+    lower at night and at weekends ([eda_expl.md, Temporal
+  patterns](eda/eda_expl.md)).
+  - One-hot meter and primary_use ([ashrae/features.py](ashrae/features.py)).
+  - Building identity, as either a learned 16-number vector per building
+  (embedding) or the mean log1p reading of each
+    building × meter series ([mlp.ipynb, Models](models/mlp.ipynb)).
+
+  This may or may not be related to the current task.</ide_selection>
+
+❯ Is there something missing?
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Two things stand out in that section:
+
+  1. "Interpolated features" doesn't say how weather was interpolated. The
+     year_built bullet tells you the fill method (training median + missing
+     flag). The weather bullet, right under the same "Interpolated" header, only
+     talks about correlation with the target and never says how air/dew temp,
+     pressure, wind speed/direction were filled — linear interpolation over
+     time? per-site median? That's the one gap that matters even at idea-level,
+     since the section header is making a claim the bullet doesn't back up.
+  2. Citation style is inconsistent within the selection. Most links elsewhere
+     in the doc are markdown links, e.g. ([mlp.ipynb,
+     Features](models/mlp.ipynb)), but the "Removed features" and "Interpolated
+     features" bullets use bare parenthetical text like (data_aggregation.ipynb
+     §3, mlp.ipynb, Features) with no actual link. Worth making uniform since
+     the rest of the report treats these as clickable references.
+
+  Everything else (what was dropped and why, the feature-engineering list) reads
+  fine at the level you've settled on — no missing ideas there.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ Fix citiations
+
+⏺ Update(human_report.md)
+  ⎿  Added 4 lines, removed 4 lines
+      25  
+      26  ### Removed features
+      27  Some features just were not appropriate for training model:
+      28 -- floor count which is missing for 83% of rows (data_aggregatio
+         -n.ipynb §3)                                                    
+      29 -- precipitation and cloud coverage, which barely relate to the 
+         -target and are often missing (EDA §7)                          
+      28 +- floor count which is missing for 83% of rows ([data_aggregati
+         +on.ipynb §3](preprocessing/data_aggregation.ipynb))            
+      29 +- precipitation and cloud coverage, which barely relate to the 
+         +target and are often missing ([EDA §7](eda/EDA.ipynb))         
+      30  
+      31  ### Interpolated features
+      32 -- year_built, filled with the training median, plus a missing f
+         -lag: it is missing for 60% of rows (data_aggregation.ipynb §3, 
+         -mlp.ipynb, Features).                                          
+      33 -- Weather: air and dew temperature, sea-level pressure, wind sp
+         -eed, and wind direction as sin/cos (mlp.ipynb, Features). Tempe
+         -rature pushes chilled water up (ρ = 0.43) and steam and hot wat
+         -er down (ρ ≈ −0.45), so the model has to combine meter type wit
+         -h weather (EDA §7).                                            
+      32 +- year_built, filled with the training median, plus a missing f
+         +lag: it is missing for 60% of rows ([data_aggregation.ipynb §3]
+         +(preprocessing/data_aggregation.ipynb), [mlp.ipynb, Features](m
+         +odels/mlp.ipynb)).                                             
+      33 +- Weather: air and dew temperature, sea-level pressure, wind sp
+         +eed, and wind direction as sin/cos ([mlp.ipynb, Features](model
+         +s/mlp.ipynb)). Temperature pushes chilled water up (ρ = 0.43) a
+         +nd steam and hot water down (ρ ≈ −0.45), so the model has to co
+         +mbine meter type with weather ([EDA §7](eda/EDA.ipynb)).       
+      34  
+      35  ### Feature Engineering
+      36  - Cyclic encoding of hour and day of week (sin/cos), from local
+           time ([mlp.ipynb, Features](models/mlp.ipynb)). Use is
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(human_report.md)
+  ⎿  Added 2 lines
+      24  With a LightGBM baseline, dropping zero electricity alone impro
+          ved RMSLE from 1.385 to 1.196, and both rules together to 1.164
+           ([EDA §9](eda/EDA.ipynb#broken)).
+      25  
+      26  ### Removed features
+      27 +                                                               
+      28  Some features just were not appropriate for training model:
+      29 +                                                               
+      30  - floor count which is missing for 83% of rows ([data_aggregati
+          on.ipynb §3](preprocessing/data_aggregation.ipynb))
+      31  - precipitation and cloud coverage, which barely relate to the 
+          target and are often missing ([EDA §7](eda/EDA.ipynb))
+      32  
+
+⏺ Update(human_report.md)
+  ⎿  Added 1 line
+      31  - precipitation and cloud coverage, which barely relate to the 
+          target and are often missing ([EDA §7](eda/EDA.ipynb))
+      32  
+      33  ### Interpolated features
+      34 +                                                               
+      35  - year_built, filled with the training median, plus a missing f
+          lag: it is missing for 60% of rows ([data_aggregation.ipynb §3]
+          (preprocessing/data_aggregation.ipynb), [mlp.ipynb, Features](m
+          odels/mlp.ipynb)).
+      36  - Weather: air and dew temperature, sea-level pressure, wind sp
+          eed, and wind direction as sin/cos ([mlp.ipynb, Features](model
+          s/mlp.ipynb)). Temperature pushes chilled water up (ρ = 0.43) a
+          nd steam and hot water down (ρ ≈ −0.45), so the model has to co
+          mbine meter type with weather ([EDA §7](eda/EDA.ipynb)).
+      37  
+
+⏺ Fixed — all citations in "Removed features" and "Interpolated features" are
+  now proper markdown links matching the rest of the doc, and added the required
+  blank lines around the lists to clear the lint warnings.
+
+❯ <ide_selection>The user selected the lines 45 to 48 from
+  /Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+  Course/Homeworks/Homework 1/human_report.md:
+
+  Adversarial validation found no feature to drop. A LightGBM classifier tells
+  2016 from 2017–2018 with AUC 0.75, but
+  only 0.52 without weather, and each weather feature alone scores 0.51–0.54.
+  Together the weather values fingerprint
+  one hour of one year, which is not a shift a model can learn from
+  ([adversarial.ipynb §1](validation/adversarial.ipynb)).
+
+  This may or may not be related to the current task.</ide_selection>
+
+❯ What is the idea if this paragraph?
+
+⏺ This paragraph is explaining a check the team ran to see if train and test
+  data differ in a way that would let the model "cheat" or that they'd need to
+  fix — adversarial validation.
+
+  The method: train a classifier whose job is just to distinguish training rows
+  (2016) from test rows (2017–2018). If that classifier can do this easily (high
+  AUC), it means some feature encodes a train/test split, which is dangerous —
+  the model could be relying on that spurious signal instead of genuinely
+  learning to predict energy use, and you'd normally want to drop that feature.
+
+  Here they found:
+  - Using all features, the classifier gets AUC 0.75 — seemingly it can tell
+    train from test.
+  - But drop weather entirely and it falls to 0.52 (basically random) — so
+    weather is the thing driving that separability.
+  - Yet each individual weather feature alone only gets 0.51–0.54 (also
+    near-random).
+
+  The conclusion: no single weather feature leaks train/test identity, but the
+  combination of weather values effectively acts like a timestamp fingerprint
+  (i.e., "this exact combination of temperature/pressure/wind only occurred in
+  this one hour of this one year"). That's not a generalizable pattern a model
+  could learn to exploit for predicting the target — it's just an artifact of
+  weather being unique per hour. So despite the AUC 0.75, there's no actual
+  feature to remove; the "leak" isn't exploitable/learnable, so they keep all
+  features.
+
+  That's the idea.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ Is is "Preprocessing" is complete now (in the sense of giving the idea)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Mostly yes — the five subsections now form a clear, non-redundant narrative:
+  what's broken and removed (anomalies), what's dropped outright, what's
+  imputed, what's engineered, and a validation check confirming none of it
+  introduces an exploitable train/test leak. Each one states a decision and its
+  reason, which is the right altitude.
+
+  Three ideas are conspicuously absent that are usually central to this exact
+  competition (per the reference write-ups you cited in the intro) — worth
+  confirming whether they're handled elsewhere in the pipeline, or genuinely
+  weren't needed:
+
+  1. Target transformation — most ASHRAE solutions train on log1p(meter_reading)
+     rather than the raw value. Your Feature Engineering section mentions using
+     mean log1p reading as a building-identity feature, which implies the
+     target itself may already be log-transformed, but the report never says so
+     directly.
+  2. Site 0 unit correction — a well-known quirk of this dataset is that site
+     0's meter readings are in the wrong units (kBTU vs kWh) and need correcting
+     before training. Not mentioned.
+  3. Weather/meter timezone alignment — weather metadata is recorded in a
+     different timezone than the meter readings; you use "local time" for cyclic
+     hour encoding (Feature Engineering), which suggests this was handled, but
+     it's not stated as its own preprocessing step.
+
+  If these three were done, each deserves a one-line bullet somewhere in this
+  section (probably under a step you haven't named, e.g. "Corrections" before
+  "Remove anomalies"). If they weren't needed for your setup, no changes
+  required — but it's worth a deliberate check rather than a silent gap, since a
+  reader familiar with this competition will be looking for them.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ What's now?
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Good — you added both missing sections (timezone correction and target
+  transformations), closing the three gaps I flagged. But scanning this version,
+  a few concrete issues:
+
+  1. Broken link, line 60: ([data_aggregation.ipynb §1] — the closing ) and the
+     actual path are missing, so this renders as broken markdown, not a link.
+  2. Duplicated sentence: "Site 0 electricity is converted from kBTU to kWh for
+     training (908,409 rows), and back for the submission" appears twice,
+     verbatim, once in "Target transformations" (line 60) and again in "Target
+     metric analysis" (line 64). Pick one home for it — it's a preprocessing
+     decision, so "Target transformations" is the natural spot; "Target metric
+     analysis" should just describe the metric.
+  3. Heading level mismatch: "## Target metric analysis" is ## (same level as
+     "Preprocessing"), while everything else here is ### under Preprocessing. If
+     it's meant to be its own top-level section, that's fine, but then the
+     site-0 unit fact (a preprocessing step) doesn't belong inside it — that's
+     likely why it got duplicated.
+  4. Ordering is out of chronological sequence: "Local time zone correction"
+     reports fixing baseline 1.395→1.385, and "Remove anomalies" (much earlier
+     in the doc) reports 1.385→1.196. That means the timezone fix logically
+     happened before anomaly removal, but it's placed near the end of the
+     section, after anomalies/features/adversarial validation. Worth reordering
+     so the RMSLE numbers read as a continuous chain top-to-bottom.
+  5. Minor: no blank line after "### Feature Engineering" before its bullet list
+     (same MD032 lint issue fixed elsewhere), and a stray double blank line
+     before "## References".
+
+  Want me to fix these directly?
+
+❯ rename section to "EDA and Metric analysis", reorder, fix other issues
+⏺ Write(human_report.md)
+  ⎿  Added 14 lines, removed 14 lines
+      10  
+      11  As a result, it boosted performance of models much more than an
+          y other dedicated model engineering. ([mlp.ipynb, Findings](mod
+          els/mlp.ipynb#follow-up)).
+      12  
+      13 +### Local time zone correction                                 
+      14 +                                                               
+      15 +As noted in the [competition forum](https://www.kaggle.com/c/as
+         +hrae-energy-prediction/discussion/115698), weather             
+      16 +timestamps are UTC while meter timestamps are local. We confirm
+         +ed it on our data: after shifting weather by each site's UTC of
+         +fset, temperature peaks at 14:00–16:00 at every site. The excep
+         +tion is site 14, whose meters are in UTC too ([EDA §6.1](eda/ED
+         +A.ipynb#temporal)). The fix improved the LightGBM baseline from
+         + 1.395 to 1.385 ([EDA §6.1](eda/EDA.ipynb#temporal)).          
+      17 +                                                               
+      18  ### Remove anomalies
+      19  
+      20  Some rows had broken energy use, like 0 energy use for some per
+          iod, spikes, constanst electricity uses for some period of time
+          , etc.
+     ...
+      42  - wind direction represented as sin/cos, than interpolated line
+          arly ([mlp.ipynb, Features](models/mlp.ipynb))
+      43  
+      44  ### Feature Engineering
+      45 +                                                               
+      46  - Cyclic encoding of hour and day of week (sin/cos), from local
+           time ([mlp.ipynb, Features](models/mlp.ipynb)).
+      47  - One-hot `meter` and `primary_use` ([ashrae/features.py](ashra
+          e/features.py)).
+      48  - Building identity, as either a learned 16-number vector per b
+          uilding (embedding) or the mean `log1p` reading of each buildin
+          g x meter series ([mlp.ipynb, Models](models/mlp.ipynb)).
+      49  
+      50 +### Target transformations                                     
+      51 +                                                               
+      52 +- RMSLE is the RMSE of `log1p` values, so we predict `log1p(met
+         +er_reading)` with an RMSE loss, which optimizes the metric     
+      53 +directly ([EDA §8](eda/EDA.ipynb#metric)). Moreover, log1p of m
+         +eter reading has bell shape, which generally good sign.        
+      54 +- Site 0 electricity is converted from kBTU to kWh for training
+         + (908,409 rows), and back for the submission ([data_aggregation
+         +.ipynb §1](preprocessing/data_aggregation.ipynb)).             
+      55 +                                                               
+      56  ### Adversarial validation
+      57  
+      58  Adversarial validation found no feature to drop. A LightGBM cla
+          ssifier tells 2016 from 2017–2018 with AUC 0.75, but
+     ...
+      60  
+      61  Together the weather values effectively act like a timestamp fi
+          ngerprint, so this leak is not actually exploitable.
+      62  
+      51 -### Local time zone correction                                 
+      63 +## EDA and Metric analysis                                     
+      64  
+      53 -As noted in the [competition forum](https://www.kaggle.com/c/as
+         -hrae-energy-prediction/discussion/115698), weather             
+      54 -timestamps are UTC while meter timestamps are local. We confirm
+         -ed it on our data: after shifting weather by each site's UTC of
+         -fset, temperature peaks at 14:00–16:00 at every site. The excep
+         -tion is site 14, whose meters are in UTC too ([EDA §6.1](eda/ED
+         -A.ipynb#temporal)). The fix improved the LightGBM baseline from
+         - 1.395 to 1.385 ([EDA §6.1](eda/EDA.ipynb#temporal)).          
+      65 +The metric measures relative error: a 10% miss costs about 0.09
+         +5 at any scale. It is harsh near zero, though: predicting 5 for
+         + a true 0 costs 1.79 ([EDA §8](eda/EDA.ipynb#metric)).         
+      66  
+      56 -### Target transformations                                     
+      57 -                                                               
+      58 -- RMSLE is the RMSE of `log1p` values, so we predict `log1p(met
+         -er_reading)` with an RMSE loss, which optimizes the metric     
+      59 -directly ([EDA §8](eda/EDA.ipynb#metric)). Moreover, log1p of m
+         -eter reading has bell shape, which generally good sign.        
+      60 -- Site 0 electricity is converted from kBTU to kWh for training
+         - (908,409 rows), and back for the submission ([data_aggregation
+         -.ipynb §1]                                                     
+      61 -                                                               
+      62 -## Target metric analysis                                      
+      63 -                                                               
+      64 -The metric measures relative error: a 10% miss costs about 0.09
+         -5 at any scale. It is harsh near zero, though: predicting 5 for
+         - a true 0 costs 1.79 ([EDA §8](eda/EDA.ipynb#metric)). Site 0 e
+         -lectricity is converted from kBTU to kWh for training (908,409 
+         -rows), and back for the submission ([data_aggregation.ipynb §1]
+         -(preprocessing/data_aggregation.ipynb), [mlp.ipynb](models/mlp.
+         -ipynb#test-predictions)).                                      
+      65 -                                                               
+      66 -                                                               
+      67  ## References
+      68  
+      69  1. 1st Place Solution in "ASHRAE Great Energy Predictor III" by
+           Isamu & Matt — <https://www.kaggle.com/competitions/ashrae-ene
+          rgy-prediction/writeups/isamu-matt-1st-place-solution-team-isam
+          u-matt>
+
+⏺ Done:
+
+  - Renamed "Target metric analysis" → "EDA and Metric analysis" and removed the
+    duplicated site-0 conversion sentence from it (that fact now lives only in
+    "Target transformations", with the broken link fixed).
+  - Reordered so "Local time zone correction" comes first (1.395→1.385), then
+    "Remove anomalies" (1.385→1.196→1.164) — the RMSLE chain now reads
+    top-to-bottom without jumping around.
+  - Added the missing blank line after "### Feature Engineering" and removed the
+    stray double blank line before "## References".
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ Is preprocessing section is clear and consistent now?
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Structurally, yes — it now reads as one coherent, chronological narrative:
+  timezone fix → anomaly removal → dropped/imputed/engineered features → target
+  transforms → a validation check confirming nothing needs undoing. The RMSLE
+  chain (1.395→1.385→1.196→1.164) runs top-to-bottom without contradiction, and
+  citations are consistently markdown links throughout.
+
+  Remaining small things, not structural:
+
+  - Line 41 (air / dew temperature and sea level pressure were interpolated
+    liearly over time) has a typo ("liearly" → "linearly") and, unlike its
+    sibling bullets on lines 40 and 42, has no citation link at all.
+  - Line 20: "constanst" → "constant".
+  - Line 53: "which generally good sign" → "which is generally a good sign".
+  - Line 33: "were not appropriate for training model" → "for the training
+    model" (missing article).
+
+  Want me to fix these four?
+
+❯ Now go back to AI report: looks like Validation strategy is inconsistent,
+  because adv val showed that we need actually 4 folds, not 1. I agreed with
+  that, but then in EDA and in Models we all evaluations on 1 split
+
+  Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+⏺ You're right — there's a real methodological inconsistency, and it's not just
+  cosmetic. Here's the chain:
+
+  The Validation section (lines 81–88) explicitly discredits the single Oct–Dec
+  split: adversarial validation shows train/val there are separable with AUC
+  0.92 (it's testing one season, driven by weather), so "from then on we used
+  four folds." That's a strong, stated claim: single-split numbers can't be
+  trusted, use 4-fold means instead.
+
+  But most of the report's actual evidence still uses the single split anyway:
+
+  - Preprocessing — anomaly removal (1.385→1.196→1.164) and timezone correction
+    (1.395→1.385) are both reported on "LightGBM baseline (train Jan–Sep,
+    validate Oct–Dec)" — the single split, not folds.
+  - Models table (lines 100–109) — the entire architecture progression (mlp
+    1.443 → mlp_bn 1.421 → mlp_4out 1.409 → mlp_4out_mean 1.122 → mlp_4out_emb
+    1.111), the number the whole "knowing the building matters most" conclusion
+    rests on, is explicitly "validating on Oct–Dec." Single split again.
+
+  And the report itself proves this is dangerous, right there in "What Didn't
+  Work": "Choosing on one fold. On Oct–Dec alone, dropout looked like a win
+  (1.111 → 1.102) but lost on the other three seasons... Oct–Dec also made the
+  series mean look tied with the embedding." That's a demonstrated case of the
+  single split flipping a conclusion — yet the main architecture table it's
+  sitting right next to used exactly that same split, unflagged.
+
+  Meanwhile two bullets in the same Models section (Optimizer: Adam, Epochs: 20)
+  do use "averaged over folds" — so within one section you're mixing
+  single-split and 4-fold numbers without telling the reader which is which or
+  why.
+
+  This isn't a wording fix — it's a real question of whether the architecture
+  conclusions (embedding beats mean, BatchNorm helps, etc.) survive on the other
+  three folds, given you already showed one architecture-adjacent choice
+  (dropout) doesn't. Two ways to resolve it:
+
+  1. Recompute the Models table (and ideally the preprocessing ablations) with
+     the 4-fold mean, replacing the Oct–Dec-only numbers, if that's cheap to
+     rerun.
+  2. If not rerun, add an explicit caveat wherever a single-split number is used
+     post-hoc — something like "(single Oct–Dec split, predates the 4-fold
+     protocol — see What Didn't Work for why this can mislead)" — so the reader
+     isn't misled into thinking these were validated the same way as the
+     optimizer/epoch choices.
+
+  Want me to draft the caveat text, or do you want to check the notebooks first
+  to see if fold-averaged numbers already exist for these and just weren't
+  pulled in?
+
+❯ /model opus
+  ⎿  Set model to claude-opus-5-5
+
+❯ Before we go further: what does it really make sense to recompute, to keep
+  the whole work consistent
+
+⏺ Recompute only the numbers that back a decision that could change on other
+  folds. Numbers that are already fold-averaged, or that rest on other evidence,
+  can stay.
+
+  Recompute (the main results)
+
+  1. The Models table, on 4 folds, with LightGBM included. It's the core
+     evidence of the report, and the headline in the intro ("1.111 vs 1.166 for
+     LightGBM") comes from it.
+     - The large step (building identity: 1.41 → ~1.11) won't flip.
+     - The small steps could: BatchNorm (−0.022), 4 outputs (−0.012) and MLP vs
+       LightGBM (−0.055). You already saw dropout flip at a similar size.
+     - The MLP has a fold average (1.203), but I don't see one for LightGBM.
+       Without it, "MLP beats LightGBM" rests on one season.
+  2. The anomaly-rule ablation, on 4 folds with LightGBM. It's cheap, and there
+     are two reasons to rerun it:
+     - The "off when needed" rule depends on season by design. Oct–Dec has
+       heating but almost no cooling, so the chilled-water half was barely
+       tested.
+     - The cut-off comparison (day 1.206 vs every zero 1.196) is close enough to
+       flip.
+
+  Keep as is, and label them as single-split where they appear
+
+  - Timezone fix (1.395 → 1.385). The decision rests on physical evidence:
+    temperature peaks at 14:00–16:00 after the shift. The score is extra
+    support, so a "(single split)" note is enough.
+  - The "Choosing on one fold" item in What Didn't Work. It's meant to be
+    single-fold, since it shows why you switched.
+  - He init (1.108 vs 1.108). It's a tie and no decision depends on it.
+
+  Already consistent
+
+  Optimizer, epochs, regularization, embedding vs mean, the hot-water error, and
+  the train–validation gap breakdown are all fold-averaged.
+
+  One more thing to settle before rerunning
+
+  Choose a primary score and use it everywhere. I'd use all rows, the way Kaggle
+  scores. Report clean rows as a second column where it helps. Right now some
+  bullets use one and some the other.
+
+  So the minimum is two reruns: the Models table (6 models × 4 folds) and the
+  LightGBM anomaly ablation (4 folds). Everything else only needs labels.
+
+❯ change validation strategy to 4 folds everywhere in the project to make it
+  consistent, update values in AI report
+
+⏺ I'll start by mapping how validation is implemented across the notebooks and
+  the ashrae package.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ The whole Homeworks folder is untracked in git, so before editing anything
+  I'll back it up. First, reading the ashrae package.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ The package already defines FOLDS and a split() helper. Now I'll dump the
+  notebook code (without outputs) to see which ones still use the single Oct–Dec
+  split.
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+⏺ Now the EDA, validation, and preprocessing notebooks.
+
+  Read 1 file, ran 2 shell commands (ctrl+o to expand)
+
+⏺ Single-split code only appears in EDA §9, mlp.ipynb, and
+  optimizers_test.ipynb, and the timezone figure (1.395 → 1.385) has no
+  supporting code, so next I'll check how preprocessing builds the weather data.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Four analyses already use the 4-fold setup (regularization, epochs,
+  season_validation, mean_vs_embedding), while several still rely on a single
+  Oct–Dec split (EDA §9 and §6.1, mlp.ipynb, optimizers_test.ipynb) —
+  adversarial.ipynb §2 stays single-split intentionally since it's the test
+  justifying the switch. Next I'll check MLflow run durations to estimate rerun
+  times.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Runs are fast on this machine (about 0.4 min per 10-epoch MLP fold), so a full
+  rerun is feasible. The Homeworks folder isn't in git, so I'm backing it up
+  first (excluding the large data folder).
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ I'll align everything with the fold notebooks' existing protocol (FOLDS,
+  2M/500K sampling, fold-average RMSLE). First, I'll move clean_weather into the
+  package so EDA can rebuild unshifted UTC weather and rerun the timezone check
+  on folds.
+
+⏺ Update(ashrae/data.py)
+  ⎿  Added 2 lines, removed 1 line
+      1 -"""Loading raw and processed data, anomaly flags and train/valid
+        -ation splits."""                                                
+      1 +"""Loading raw and processed data, weather cleaning, anomaly fla
+        +gs and train/validation splits."""                              
+      2 +import numpy as np                                              
+      3  import pandas as pd
+      4  
+      5  from .config import DATA, PROCESSED
+
+⏺ Update(ashrae/data.py)
+  ⎿  Added 19 lines
+      26      return pd.read_csv(DATA / name, usecols=["site_id", "timest
+          amp", *columns], parse_dates=["timestamp"], dtype=dtype)
+      27  
+      28  
+      29 +def clean_weather(w):                                          
+      30 +    """Each site on a full hourly grid, gaps filled by linear i
+         +nterpolation within the site; a column a site never            
+      31 +    reports gets the other sites' mean at that hour. Wind direc
+         +tion is interpolated as sin/cos."""                            
+      32 +    columns = [c for c in w.columns if c not in ("site_id", "ti
+         +mestamp")]                                                     
+      33 +    hours = pd.date_range(w.timestamp.min(), w.timestamp.max(),
+         + freq="h")                                                     
+      34 +    grid = pd.MultiIndex.from_product([w.site_id.unique(), hour
+         +s], names=["site_id", "timestamp"])                            
+      35 +    w = w.set_index(["site_id", "timestamp"]).reindex(grid).res
+         +et_index()                                                     
+      36 +                                                               
+      37 +    rad = np.deg2rad(w.pop("wind_direction"))                  
+      38 +    w["wd_sin"], w["wd_cos"] = np.sin(rad), np.cos(rad)        
+      39 +                                                               
+      40 +    cols = w.columns.drop(["site_id", "timestamp"])            
+      41 +    w[cols] = w.groupby("site_id")[cols].transform(lambda s: s.
+         +interpolate(limit_direction="both"))                           
+      42 +    w[cols] = w[cols].fillna(w.groupby("timestamp")[cols].trans
+         +form("mean"))                                                  
+      43 +                                                               
+      44 +    w["wind_direction"] = np.rad2deg(np.arctan2(w.pop("wd_sin")
+         +, w.pop("wd_cos"))) % 360                                      
+      45 +    return w.astype({c: "float32" for c in columns})           
+      46 +                                                               
+      47 +                                                               
+      48  def read_processed(name="train_merged.parquet", columns=None):
+      49      """Output of preprocessing/data_aggregation.ipynb."""
+      50      return pd.read_parquet(PROCESSED / name, columns=columns)
+
+⏺ Now I'll verify that the moved function reproduces the saved processed weather
+  exactly, so I don't need to regenerate the parquet files.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ The refactor reproduces the saved weather exactly, so the processed parquet
+  files stay valid. Next I'll write a small helper for editing notebook cells
+  and update data_aggregation.ipynb to import the function.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+⏺ Now the EDA §9 ablation. It moves to 4 folds and gains a "weather left in UTC"
+  variant, so the §6.1 timezone number comes from real code.
+
+  Ran 1 shell command (ctrl+o to expand)
+⏺ Starting the EDA rerun in the background (about 32 LightGBM fits) while I
+  rewrite mlp.ipynb.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ While EDA runs, I'll prepare the mlp.ipynb rewrite. Checking the plotting
+  helper first.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+⏺ Now optimizers_test.ipynb: 2 models × 4 optimizers × 4 folds, 20 epochs each.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ mlp.ipynb and optimizers_test.ipynb are rewritten. EDA is still running; I'll
+  check memory before deciding whether to start the MLP runs alongside it.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Free memory is tight while EDA runs, so I'll run the notebooks one after
+  another. Meanwhile I'm checking the existing fold notebooks' outputs for
+  numbers the report quotes.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Those numbers are all on 4 folds already. Now I'll wait for the EDA run to
+  finish.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Background command "Execute EDA notebook with 4-fold ablation" completed (exit
+code 0)
+
+⏺ EDA finished. I'll start mlp.ipynb right away and read the EDA results while
+  it runs.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+⏺ The EDA shows dropping anomalies helps on clean rows but hurts on all rows
+  overall (worse in Jan–Mar and Apr–Jun, the folds with most anomalies), while
+  the timezone fix is small but consistently non-harmful. I'll add a per-fold
+  clean-rows table to confirm this and rerun after the model notebooks.
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+⏺ Only the final retrain and test predictions are left. I'll pull the fold
+  scores from MLflow in the meantime.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+⏺ Background command "Execute mlp notebook with 4-fold comparison" completed
+(exit code 0)
+
+⏺ Background command "Wait for mlp notebook execution to finish" completed (exit
+code 0)
+
+⏺ mlp.ipynb finished. I'll confirm the optimizer run started and read the MLP
+  results.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ The 4-fold MLP comparison confirms prior findings: building-identity embedding
+  (1.200) beats series mean (1.244) and LightGBM (1.280), BatchNorm and
+  per-meter outputs help slightly, and He init ties. While optimizer runs
+  continue, I'm updating markdown text in notebooks that referenced the old
+  single split (no rerun needed since these are text-only edits).
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Now eda_expl.md, which also quotes the old numbers.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Since the stuck-meter and spike rules were removed from the codebase, I can't
+  verify that "didn't work" claim against the folds directly. I'll re-add both
+  as extra variants in the EDA ablation to test them properly.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ The optimizer notebook is 17 of 32 runs in. When it finishes I'll rerun EDA
+  with the new variants.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Background command "Wait for mlp, then start optimizers notebook" completed
+(exit code 0)
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ I've compiled the 4-fold optimizer comparison; Adam wins across all folds,
+  with its edge on the embedding model even larger than on the single split
+  (0.021 vs 0.010). Now writing up the findings in the two rerun model
+  notebooks.
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+⏺ The EDA rerun matches the original results, and per-fold data confirms clean
+  rows still improve with anomaly filtering (Jan–Mar and Apr–Jun), with the
+  full-loss increase tied to anomaly rows in validation and negligible impact
+  from the stuck-meter/spike rules. Now I'll write up the EDA findings.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ All three reruns are done (EDA, the MLP comparison and the optimizers, now all
+  on 4 folds). I'm finishing the notebook text, then I'll update eda_expl.md
+  and the AI report.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Now eda_expl.md.
+⏺ Update(eda/eda_expl.md)
+  ⎿  Added 2 lines, removed 1 line
+      36  
+      37  - Weather timestamps are UTC, meter timestamps local (site 14: 
+          UTC too). Checked on our data: after shifting, the
+      38    temperature peaks at 14:00–16:00 at every site.
+      39 -- → Shift weather by the site's UTC offset before merging (not 
+         -at site 14). LightGBM: 1.395 → 1.385.                          
+      39 +- → Shift weather by the site's UTC offset before merging (not 
+         +at site 14). LightGBM, 4-fold average: 1.290 → 1.286           
+      40 +  (clean rows 1.147 → 1.140); no fold gets worse.              
+      41  
+      42  ## Features vs target (§7)
+      43  
+
+⏺ Update(eda/eda_expl.md)
+  ⎿  Added 5 lines, removed 3 lines
+      54  ## Anomalies (§9)
+      55  
+      56  - Zero electricity = broken meter or data gap. Heating at zero 
+          for a week in the cold, or cooling in the heat, too.
+      57 -- → Drop them from training only. LightGBM (train Jan–Sep, vali
+         -date Oct–Dec): 1.385 → 1.196 without zero                      
+      58 -  electricity, → 1.164 with both rules. Shorter cut-offs work b
+         -etter: even a few hours of zeros teach the model that          
+      59 -  a building can use no power.                                 
+      57 +- → Drop them from training only. LightGBM, 4-fold average on c
+         +lean rows: 1.140 → 1.061 without zero electricity,             
+      58 +  → 1.048 with both rules, better in every fold. Shorter cut-of
+         +fs work better: even a few hours of zeros teach the            
+      59 +  model that a building can use no power.                      
+      60 +- On all rows the average barely moves (1.286 → 1.281): Jul–Dec
+         + improves, Jan–Jun gets worse, because there the               
+      61 +  broken meters stay broken into the validation months. Oct–Dec
+         + alone (1.383 → 1.168) overstated the gain.                    
+      62  - Anomaly rows stay in validation and cost up to 0.48 RMSLE per
+           fold
+      63    ([season_validation.ipynb](../validation/season_validation.ip
+          ynb)).
+      64  
+
+⏺ Update(eda/eda_expl.md)
+  ⎿  Added 3 lines, removed 2 lines
+      64  
+      65  ## What didn't work
+      66  
+      67 -- Two more anomaly rules: stuck meters (same value for 48+ hour
+         -s) and spikes (> 10× the daily median). Neither                
+      68 -  improved the score; the spike rule mostly flagged normal on/o
+         -ff cycling. Both left out.                                     
+      67 +- Two more anomaly rules: stuck meters (same non-zero value for
+         + 48+ hours) and spikes (> 10× the daily median). On            
+      68 +  top of both rules they change the 4-fold average by 0.003 at 
+         +most; the spike rule mostly flagged normal on/off              
+      69 +  cycling. Both left out.                                      
+      70  
+      71  ## What was removed from the notebook
+      72  
+
+⏺ Now the AI report. I'm re-reading it first in case it changed.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(AI_Report.md)
+  ⎿  Added 2 lines, removed 3 lines
+       2  
+       3  We predict hourly energy use of ~1,450 buildings at 16 sites fo
+          r 4 meter types, scored with RMSLE
+       4  ([EDA.ipynb](eda/EDA.ipynb)). Our final model is a small MLP wi
+          th one output per meter type and a learned vector per
+       5 -building. On October–December it scores 1.111 against 1.166 for
+         - LightGBM ([mlp.ipynb](models/mlp.ipynb)), and 1.203           
+       6 -averaged over all four seasons ([mean_vs_embedding.ipynb](valid
+         -ation/mean_vs_embedding.ipynb)). Every number below            
+       7 -links to the notebook it comes from.                           
+       5 +building. It scores 1.200 against 1.280 for LightGBM ([mlp.ipyn
+         +b](models/mlp.ipynb)). Every score in this report is           
+       6 +an average over four seasonal folds of 2016 ([Validation](#vali
+         +dation)), and links to the notebook it comes from.             
+       7  
+       8  ## Preprocessing
+       9  
+
+⏺ Update(AI_Report.md)
+  ⎿  Added 1 line, removed 2 lines
+       9  
+      10  ### Remove anomalies
+      11  
+      12 -Cleaning the data mattered more than any architecture choice ([
+         -mlp.ipynb, Findings](models/mlp.ipynb#follow-up)). Some        
+      13 -readings don't reflect energy use, and training on them teaches
+         - the model that a building can use no power                    
+      12 +Some readings don't reflect energy use, and training on them te
+         +aches the model that a building can use no power               
+      13  ([EDA §9](eda/EDA.ipynb#broken)). We flag two kinds:
+      14  
+      15  - **Zero electricity:** every electricity reading of exactly 0.
+           A building always draws some power, so a zero is a
+
+⏺ Update(AI_Report.md)
+  ⎿  Added 11 lines, removed 4 lines
+      21  We drop them from training only, and keep them when scoring val
+          idation, since Kaggle scores every test row
+      22  ([data_aggregation.ipynb §4](preprocessing/data_aggregation.ipy
+          nb)).
+      23  
+      24 -With a LightGBM baseline (train Jan–Sep, validate Oct–Dec), dro
+         -pping zero electricity alone improved RMSLE from 1.385         
+      25 -to 1.196, and both rules together to 1.164 ([EDA §9](eda/EDA.ip
+         -ynb#broken)). Shorter cut-offs worked better: requiring        
+      26 -a zero run of 30 days gave 1.267, a week 1.223, a day 1.206, an
+         -d dropping every zero 1.196, so even a few hours of zeros      
+      27 -hurt ([EDA §9](eda/EDA.ipynb#broken)).                         
+      24 +With a LightGBM baseline, dropping them makes the model better 
+         +at real consumption in every fold: on clean rows               
+      25 +RMSLE goes from 1.140 to 1.061 without zero electricity, and to
+         + 1.048 with both rules ([EDA §9](eda/EDA.ipynb#broken)).       
+      26 +Shorter cut-offs worked better: requiring a zero run of 30 days
+         + gave 1.095, a week 1.075, a day 1.067, and dropping           
+      27 +every zero 1.061, so even a few hours of zeros hurt ([EDA §9](e
+         +da/EDA.ipynb#broken)).                                         
+      28  
+      29 +On all rows, as Kaggle scores, the average barely moves: 1.286 
+         +→ 1.281. Jul–Sep and Oct–Dec improve (Oct–Dec                  
+      30 +1.383 → 1.168), but Jan–Mar and Apr–Jun get worse (1.363 → 1.48
+         +5, 1.187 → 1.301). Those folds have the most anomalies         
+      31 +in validation, and they still improve on clean rows. So the los
+         +s comes from the anomaly rows: a model trained on a            
+      32 +broken meter's zeros predicts low values, and that pays off whe
+         +n the outage continues into the validation months              
+      33 +([EDA §9](eda/EDA.ipynb#broken)). We keep dropping anomalies. W
+         +hether 2016's outages continue into the test years             
+      34 +can only be checked with a leaderboard score.                  
+      35 +                                                               
+      36  ### Impute missing weather values
+      37  
+      38  Cloud coverage (49%) and precipitation (36%) are missing most o
+          ften, some sites have no data at all for a column
+
+⏺ Update(AI_Report.md)
+  ⎿  Added 2 lines, removed 2 lines
+      46  As noted in the [competition forum](https://www.kaggle.com/c/as
+          hrae-energy-prediction/discussion/115698), weather
+      47  timestamps are UTC while meter timestamps are local. We confirm
+          ed it on our data: after shifting weather by each
+      48  site's UTC offset, temperature peaks at 14:00–16:00 at every si
+          te. The exception is site 14, whose meters are in UTC
+      49 -too ([EDA §6.1](eda/EDA.ipynb#temporal)). The fix improved the 
+         -LightGBM baseline from 1.395 to 1.385                          
+      50 -([EDA §6.1](eda/EDA.ipynb#temporal)).                          
+      49 +too ([EDA §6.1](eda/EDA.ipynb#temporal)). The fix improved the 
+         +LightGBM baseline from 1.290 to 1.286 (clean rows              
+      50 +1.147 → 1.140). The gain is small, but no fold gets worse ([EDA
+         + §9](eda/EDA.ipynb#broken)).                                   
+      51  
+      52  ### Target transformations
+      53  
+
+⏺ Now the Validation, Models and What Didn't Work sections.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(AI_Report.md)
+  ⎿  Added 7 lines, removed 6 lines
+      85  
+      86  ## Validation
+      87  
+      88 -Our first split trained on Jan–Sep and validated on Oct–Dec ([m
+         -lp.ipynb, Data](models/mlp.ipynb)). Adversarial                
+      89 -validation showed this tests one season: the two parts are told
+         - apart with AUC 0.92, all from weather                         
+      90 -([adversarial.ipynb §2](validation/adversarial.ipynb)). From th
+         -en on we used four folds: each holds out one 3-month           
+      91 -block of 2016 and trains on the other nine, and settings are co
+         -mpared by the mean over the folds                              
+      92 -([adversarial.ipynb, How to use this](validation/adversarial.ip
+         -ynb)). Training on months after the validation block is        
+      93 -acceptable here: the test set is a later year with known weathe
+         -r ([adversarial.ipynb, How to use this](validation/adversarial.
+         -ipynb)).                                                       
+      88 +Our first split trained on Jan–Sep and validated on Oct–Dec. Ad
+         +versarial validation showed this tests one season: the         
+      89 +two parts are told apart with AUC 0.92, all from weather ([adve
+         +rsarial.ipynb §2](validation/adversarial.ipynb)). So           
+      90 +every comparison in the project uses four folds instead, from t
+         +he anomaly rules to the optimizers. Each fold holds out        
+      91 +one 3-month block of 2016 and trains on the other nine, with 2M
+         + training and 500K validation rows sampled per fold, and       
+      92 +settings are compared by the mean over the folds ([adversarial.
+         +ipynb, How to use this](validation/adversarial.ipynb)).        
+      93 +Training on months after the validation block is acceptable her
+         +e: the test set is a later year with known weather             
+      94 +([adversarial.ipynb, How to use this](validation/adversarial.ip
+         +ynb)).                                                         
+      95  
+      96  Each fold is scored twice: on all rows, as Kaggle scores, and o
+          n clean rows without anomalies, which measures the
+      97  error on real consumption ([season_validation.ipynb](validation
+          /season_validation.ipynb)). This explained the large
+
+⏺ Update(AI_Report.md)
+  ⎿  Added 19 lines, removed 15 lines
+      103  ## Models
+      104  
+      105  All networks are trained by one PyTorch Lightning module and l
+           ogged to MLflow ([mlp.ipynb, Frameworks](models/mlp.ipynb#fram
+           eworks)).
+      106 -We built the model up one change at a time, validating on Oct–
+          -Dec ([mlp.ipynb, Results](models/mlp.ipynb)):                 
+      106 +We built the model up one change at a time, 10 epochs each ([m
+          +lp.ipynb, Results](models/mlp.ipynb)):                        
+      107  
+      108 -| Model | Change | RMSLE, Oct–Dec |                           
+      109 -| --- | --- | --- |                                           
+      110 -| mlp | 2 hidden layers of 64, ReLU, Adam | 1.443 |           
+      111 -| mlp_bn | + BatchNorm | 1.421 |                              
+      112 -| mlp_4out | + one output per meter type | 1.409 |            
+      113 -| mlp_4out_mean | + series mean input | 1.122 |               
+      114 -| mlp_4out_emb | + building embedding instead | 1.111 |       
+      115 -| lgbm | LightGBM, untuned, same features | 1.166 |           
+      108 +| Model | Change | RMSLE, all rows | RMSLE, clean rows |      
+      109 +| --- | --- | --- | --- |                                     
+      110 +| mlp | 2 hidden layers of 64, ReLU, Adam | 1.559 | 1.380 |   
+      111 +| mlp_bn | + BatchNorm | 1.546 | 1.368 |                      
+      112 +| mlp_4out | + one output per meter type | 1.534 | 1.350 |    
+      113 +| mlp_4out_mean | + series mean input | 1.244 | 0.994 |       
+      114 +| mlp_4out_emb | + building embedding instead | 1.200 | 0.938 
+          +|                                                             
+      115 +| lgbm | LightGBM, untuned, same features | 1.280 | 1.045 |   
+      116  
+      117 -- **Knowing the building matters most:** 1.41 → ~1.11. Buildin
+          -gs with the same size, use and weather differ in              
+      118 -  consumption by orders of magnitude ([mlp.ipynb, Findings](mo
+          -dels/mlp.ipynb#follow-up)).                                   
+      119 -- **Embedding beats series mean** in every season, 0.943 vs 0.
+          -990 on clean rows (fold average), although the two            
+      120 -  tie on Oct–Dec ([mean_vs_embedding.ipynb](validation/mean_vs
+          -_embedding.ipynb)). The gain is in heating and cooling        
+      117 +- **Knowing the building matters most:** 1.534 → 1.244 with th
+          +e series mean, 1.200 with the embedding. Both beat            
+      118 +  LightGBM in every fold. Buildings with the same size, use an
+          +d weather differ in consumption by orders of magnitude        
+      119 +  ([mlp.ipynb, Findings](models/mlp.ipynb#follow-up)).        
+      120 +- **Architecture tweaks help a little:** BatchNorm improves ev
+          +ery fold, and one output per meter type improves 3 of 4.      
+      121 +  Both gains are around 0.01, close to seed noise ([mlp.ipynb,
+          + Findings](models/mlp.ipynb#follow-up)).                      
+      122 +- **Embedding beats series mean** in every season, 0.943 vs 0.
+          +990 on clean rows. The two nearly tie on Oct–Dec              
+      123 +  (1.110 vs 1.114) ([mean_vs_embedding.ipynb](validation/mean_
+          +vs_embedding.ipynb)). The gain is in heating and cooling      
+      124    (chilled water 0.078, steam 0.090, electricity 0.009): the e
+           mbedding can learn how a building reacts to weather, the
+      125    mean only gives its average level ([mean_vs_embedding.ipynb,
+            Findings](validation/mean_vs_embedding.ipynb)).
+      123 -- **Optimizer: Adam.** It averaged 1.113 over both building-aw
+          -are models, against 1.119 for momentum and Nesterov           
+      124 -  and 1.123 for plain SGD, and its lead comes from the embeddi
+          -ng model ([optimizers_test.ipynb](models/optimizers_test.ipynb
+          -)).                                                           
+      126 +- **Optimizer: Adam.** It averaged 1.213 over both building-aw
+          +are models, against 1.223 for momentum and Nesterov           
+      127 +  and 1.237 for plain SGD, and it's best in every fold. Its le
+          +ad comes from the embedding model (1.190 vs 1.211–1.229)      
+      128 +  ([optimizers_test.ipynb](models/optimizers_test.ipynb)).    
+      129  - **Epochs: 20.** Validation keeps improving up to the last ep
+           och tested: 1.219 at 5 epochs, 1.200 at 10, 1.186 at 20,
+      130    averaged over folds ([epochs_test.ipynb](models/epochs_test.
+           ipynb)).
+      131  - **Hot water is hardest:** 1.758 on Oct–Dec against 0.707 for
+            electricity ([mlp.ipynb, Results](models/mlp.ipynb)),
+
+⏺ Update(AI_Report.md)
+  ⎿  Added 2 lines, removed 2 lines
+      128    ([optimizers_test.ipynb](models/optimizers_test.ipynb)).
+      129  - **Epochs: 20.** Validation keeps improving up to the last ep
+           och tested: 1.219 at 5 epochs, 1.200 at 10, 1.186 at 20,
+      130    averaged over folds ([epochs_test.ipynb](models/epochs_test.
+           ipynb)).
+      131 -- **Hot water is hardest:** 1.758 on Oct–Dec against 0.707 for
+          - electricity ([mlp.ipynb, Results](models/mlp.ipynb)),        
+      132 -  and 1.57 against 0.42 on clean rows over all folds ([mean_vs
+          -_embedding.ipynb](validation/mean_vs_embedding.ipynb)).       
+      131 +- **Hot water is hardest:** 1.57 against 0.95 for electricity 
+          +on all rows ([mlp.ipynb, Results](models/mlp.ipynb)),         
+      132 +  and 1.57 against 0.42 on clean rows ([mean_vs_embedding.ipyn
+          +b](validation/mean_vs_embedding.ipynb)).                      
+      133  
+      134  ## Ensembling
+      135  
+
+⏺ Update(AI_Report.md)
+  ⎿  Added 9 lines, removed 7 lines
+      148    ([regularization_test.ipynb](models/regularization_test.ipyn
+           b), [epochs_test.ipynb](models/epochs_test.ipynb)).
+      149  - **Choosing on one fold.** On Oct–Dec alone, dropout looked l
+           ike a win (1.111 → 1.102) but lost on the other three
+      150    seasons ([regularization_test.ipynb, Findings](models/regula
+           rization_test.ipynb)). Oct–Dec also made the series mean
+      151 -  look tied with the embedding, and made validation look flat 
+          -after epoch 9                                                 
+      152 -  ([mean_vs_embedding.ipynb](validation/mean_vs_embedding.ipyn
+          -b), [epochs_test.ipynb](models/epochs_test.ipynb)).           
+      153 -- **SGD-based optimizers.** Plain SGD varied about twice as mu
+          -ch from epoch to epoch as the others. Momentum and            
+      154 -  Nesterov were stable but still behind Adam on the embedding 
+          -model (1.118–1.120 vs 1.108)                                  
+      151 +  look tied with the embedding and made validation look flat a
+          +fter epoch 9. It also overstated the anomaly rules:           
+      152 +  1.383 → 1.168 there, 1.286 → 1.281 on the fold average ([mea
+          +n_vs_embedding.ipynb](validation/mean_vs_embedding.ipynb),    
+      153 +  [epochs_test.ipynb](models/epochs_test.ipynb), [EDA §9](eda/
+          +EDA.ipynb#broken)).                                           
+      154 +- **SGD-based optimizers.** Plain SGD changed 3–4× as much fro
+          +m epoch to epoch as the others. Momentum and Nesterov         
+      155 +  were stable but still behind Adam on the embedding model (1.
+          +211–1.212 vs 1.190)                                           
+      156    ([optimizers_test.ipynb](models/optimizers_test.ipynb)).
+      156 -- **He initialization:** same score as PyTorch's default (1.10
+          -8 vs 1.108), since BatchNorm re-normalizes every hidden       
+      157 +- **He initialization:** same score as PyTorch's default (1.19
+          +9 vs 1.200), since BatchNorm re-normalizes every hidden       
+      158    layer ([mlp.ipynb, What didn't work](models/mlp.ipynb#follow
+           -up)).
+      158 -- **Two more anomaly rules:** stuck meters (the same value for
+          - 48+ hours) and spikes (more than 10× the daily               
+      159 -  median). Neither improved the score, and the spike rule most
+          -ly flagged normal on/off cycling                              
+      159 +- **Two more anomaly rules:** stuck meters (the same non-zero 
+          +value for 48+ hours) and spikes (more than 10× the daily      
+      160 +  median). On top of the two rules, they change the score by 0
+          +.003 at most while dropping another 0.8–1.5% of               
+      161 +  training rows ([EDA §9](eda/EDA.ipynb#broken)). The spike ru
+          +le mostly flagged normal on/off cycling                       
+      162    ([eda_expl.md, What didn't work](eda/eda_expl.md)).
+      163  
+      164  ## Not Done Yet
+
+⏺ Final check: I'll fix one citation (the Oct–Dec tie numbers should come from
+  the notebook the link points to), then sweep the whole project for leftover
+  single-split numbers.
+
+⏺ Update(AI_Report.md)
+  ⎿  Added 1 line, removed 1 line
+      120  - **Architecture tweaks help a little:** BatchNorm improves ev
+           ery fold, and one output per meter type improves 3 of 4.
+      121    Both gains are around 0.01, close to seed noise ([mlp.ipynb,
+            Findings](models/mlp.ipynb#follow-up)).
+      122  - **Embedding beats series mean** in every season, 0.943 vs 0.
+           990 on clean rows. The two nearly tie on Oct–Dec
+      123 -  (1.110 vs 1.114) ([mean_vs_embedding.ipynb](validation/mean_
+          -vs_embedding.ipynb)). The gain is in heating and cooling      
+      123 +  (1.111 vs 1.122) ([mean_vs_embedding.ipynb](validation/mean_
+          +vs_embedding.ipynb)). The gain is in heating and cooling      
+      124    (chilled water 0.078, steam 0.090, electricity 0.009): the e
+           mbedding can learn how a building reacts to weather, the
+      125    mean only gives its average level ([mean_vs_embedding.ipynb,
+            Findings](validation/mean_vs_embedding.ipynb)).
+      126  - **Optimizer: Adam.** It averaged 1.213 over both building-aw
+           are models, against 1.223 for momentum and Nesterov
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Every comparison in the project now uses the same 4 seasonal folds, and all
+  three reruns finished cleanly. I updated the AI report's numbers and removed
+  its claim that data cleaning mattered more than any architecture choice. That
+  claim doesn't hold on 4 folds, which is the main thing to decide on below.
+
+  What I changed and reran
+  - EDA §9: the LightGBM anomaly test now runs on 4 folds. I added a variant
+    with weather left in UTC, so the timezone number now comes from code;
+    before, nothing in the project produced it. I also added two variants for
+    the stuck-meter and spike rules, whose "didn't work" claim also had no code
+    behind it.
+  - mlp.ipynb (models/mlp.ipynb): the model table, LightGBM and He init are on 4
+    folds, 10 epochs each.
+  - optimizers_test.ipynb (models/optimizers_test.ipynb): 4 folds.
+  - Text only, no rerun needed: adversarial, mean_vs_embedding,
+    regularization_test, epochs_test, data_aggregation and eda_expl.md
+    (eda/eda_expl.md).
+  - Small refactor: clean_weather moved into ashrae/data.py. I checked it gives
+    exactly the same weather as the saved data files, so they didn't need
+    rebuilding.
+  - The submission was regenerated with the same model and seed.
+  - The only single-split code left is the adversarial check itself
+    (adversarial.ipynb §2), because that check is the reason for the switch.
+
+  What held up (fold averages, all rows)
+  - The MLP with a building embedding scores 1.200 vs 1.280 for LightGBM, and
+    wins in every fold.
+  - Adam is still the best optimizer, now in every fold.
+  - He initialization still ties PyTorch's default (1.199 vs 1.200).
+  - BatchNorm and one output per meter type each help by about 0.01, which is
+    close to seed noise.
+
+  What changed: dropping anomalies
+  - On clean rows it helps in every fold: 1.140 → 1.048.
+  - On all rows, as Kaggle scores, the average barely moves: 1.286 → 1.281.
+    - Oct–Dec improves 1.383 → 1.168 (the old headline) and Jul–Sep improves
+      too.
+    - Jan–Mar gets worse (1.363 → 1.485) and so does Apr–Jun (1.187 → 1.301).
+    - In those two folds clean rows still improve, so the loss is on the anomaly
+      rows themselves. A model trained on a broken meter's zeros predicts low
+      values, which pays off when the meter stays broken into the validation
+      months.
+  - Whether the test years behave this way can only be checked with a
+    leaderboard score.
+
+  Decision for you: I kept dropping anomalies, because the clean-row score
+  rewards it. A Kaggle submission of the current file would show whether the
+  test years behave like Jan–Jun or like Jul–Dec.
+
+  I didn't edit human_report.md, since you're writing it yourself. It still has
+  the old numbers:
+  - line 11, "boosted performance… more than any other model engineering" — no
+    longer supported on all rows;
+  - line 16, the timezone fix 1.395 → 1.385 — now 1.290 → 1.286;
+  - line 29, the anomaly rules 1.385 → 1.164 — now 1.140 → 1.048 on clean rows,
+    1.286 → 1.281 on all rows.
+
+  A backup of the homework from before these changes (without the data folder)
+  is in the scratchpad at backup_hw1/.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/AI_Report.md in the IDE.
+  This may or may not be related to the current task.</ide_opened_file>
+
+❯ At this moment: is there so much sense in preprocessing section?
+
+⏺ Yes, but not as the "big win" it used to be framed as. Each step now has a
+  different kind of justification:
+
+  ┌───────────────┬────────────────────────────┬───────────────────────────┐
+  │     Step      │       Why it's there       │       Evidence now        │
+  ├───────────────┼────────────────────────────┼───────────────────────────┤
+  │ log1p target  │ Makes the loss exactly the │ Follows from the metric,  │
+  │ + MSE         │  metric                    │ no ablation needed        │
+  ├───────────────┼────────────────────────────┼───────────────────────────┤
+  │ Site 0 kBTU → │ Correctness: one site on a │ Not measured              │
+  │  kWh          │  different scale           │                           │
+  ├───────────────┼────────────────────────────┼───────────────────────────┤
+  │ Weather       │ Required: the MLP can't    │ Not measured, not         │
+  │ imputation    │ take NaNs                  │ optional                  │
+  ├───────────────┼────────────────────────────┼───────────────────────────┤
+  │ Timezone fix  │ Physically correct         │ +0.004, no fold worse —   │
+  │               │ (temperature peaks)        │ small                     │
+  ├───────────────┼────────────────────────────┼───────────────────────────┤
+  │ Drop          │ Model learns real          │ +0.092 clean rows, ≈0 on  │
+  │ anomalies     │ consumption                │ all rows                  │
+  └───────────────┴────────────────────────────┴───────────────────────────┘
+
+  So four of five steps are about correctness, not score, and that's a
+  legitimate reason to keep them. The section just shouldn't sell them as score
+  gains.
+
+  The anomaly part is where the real value moved. The rule itself is
+  score-neutral on Kaggle's metric. But the analysis behind it explains the
+  project's biggest effects:
+  - anomalies cost up to 0.48 RMSLE per fold;
+  - they cause most of the train/validation gap;
+  - they're why the seasons differ so much.
+
+  That insight matters more than the rule, and right now it's split between
+  Preprocessing and Validation.
+
+  There's also one gap: every anomaly and timezone number comes from LightGBM.
+  The effect on the MLP, the model you actually submit, was never measured. It
+  could be larger or smaller.
+
+  My suggestion: shorten Preprocessing to what each step fixes, and move the
+  anomaly findings (clean vs all rows, the seasonal effect, what anomaly rows
+  cost) into Validation, where they explain the scores. Optionally, one MLP run
+  with anomalies kept (4 folds, about 2 minutes) would close the LightGBM-only
+  gap. Want me to do either?
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/models/mlp.ipynb in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ add lgmb baseline to val RMSE plot in mlp
+
+⏺ LightGBM has no per-epoch history, so I'll draw its fold-average validation
+  RMSLE as a dashed horizontal line on the validation panel.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Now I'm rerunning the notebook so the saved plot updates. It takes about 15
+  minutes, since it also retrains the final model.
+
+  Ran 3 shell commands (ctrl+o to expand)
+⏺ Background command "Re-execute mlp notebook to refresh plot" completed (exit
+code 0)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ The validation plot in mlp.ipynb (models/mlp.ipynb) now shows LightGBM as a
+  dashed gray line at its fold average, 1.280, labelled in the legend. LightGBM
+  has no epochs, so it's a flat reference line rather than a curve.
+
+  I reran the whole notebook to refresh the plot, and the scores came out the
+  same (embedding model 1.200). On the plot, the series-mean and embedding
+  models drop below LightGBM from about epoch 2 onward. The three models that
+  don't know the building stay well above it.
+
+⏺ Background command "Wait for notebook run to finish" completed (exit code 0)
+
+⏺ That was the leftover wait command finishing. Nothing else is running.
+
+❯ <ide_selection>The user selected the lines 112 to 118 from
+  /Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+  Course/Homeworks/Homework 1/ashrae/modeling.py:
+  Binary cross-entropy
+
+      eps = 1e-12
+      bce = -(
+          y_true * torch.log(probs + eps) + (1 - y_true) * torch.log(1 - probs
+  + eps)
+      )
+      data_loss = bce.mean()
+      return data_loss
+  This may or may not be related to the current task.</ide_selection>
+
+❯ In modeling.py in CustomMLP implement rmsle loss instead of that loss
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ The class is a hand-written sigmoid classifier with a manual backward, so
+  changing the loss means changing the output layer and the gradient too. First
+  I'll check where it's used.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ CustomMLP isn't used anywhere else, so I'll turn it into a regressor: a linear
+  output that predicts log1p(reading), the RMSLE loss, and the matching
+  gradient in backward.
+
+⏺ Update(ashrae/modeling.py)
+  ⎿  Added 14 lines, removed 34 lines
+       95          A1 = relu(Z1)
+       96          Z2 = A1 @ self.W2 + self.b2
+       97          A2 = relu(Z2)
+       98 -        logits = A2 @ self.W3 + self.b3                       
+       99 -        probs = torch.sigmoid(logits)  # sigmoid output, shape
+          - (N,1)                                                        
+      100 -        cache = {                                             
+      101 -            "X": X,                                           
+      102 -            "Z1": Z1,                                         
+      103 -            "A1": A1,                                         
+      104 -            "Z2": Z2,                                         
+      105 -            "A2": A2,                                         
+      106 -            "logits": logits,                                 
+      107 -            "probs": probs,                                   
+      108 -        }                                                     
+      109 -        return probs, cache                                   
+       98 +        pred = A2 @ self.W3 + self.b3  # linear output: predic
+          +ted log1p(reading), shape (N,1)                               
+       99 +        cache = {"X": X, "Z1": Z1, "A1": A1, "Z2": Z2, "A2": A
+          +2, "pred": pred}                                              
+      100 +        return pred, cache                                    
+      101  
+      111 -    def loss(self, y_true, probs):                            
+      112 -        # Binary cross-entropy                                
+      113 -        eps = 1e-12                                           
+      114 -        bce = -(                                              
+      115 -            y_true * torch.log(probs + eps) + (1 - y_true) * t
+          -orch.log(1 - probs + eps)                                     
+      116 -        )                                                     
+      117 -        data_loss = bce.mean()                                
+      118 -        return data_loss                                      
+      102 +    def loss(self, y_true, pred):                             
+      103 +        """RMSLE, with `y_true` and `pred` both in log1p space
+          +: RMSE of log1p values is exactly RMSLE."""                   
+      104 +        return torch.sqrt(torch.mean((pred - y_true) ** 2))   
+      105  
+      106      def backward(self, cache, y_true):
+      121 -        X, Z1, A1, Z2, A2, logits, probs = (                  
+      122 -            cache["X"],                                       
+      123 -            cache["Z1"],                                      
+      124 -            cache["A1"],                                      
+      125 -            cache["Z2"],                                      
+      126 -            cache["A2"],                                      
+      127 -            cache["logits"],                                  
+      128 -            cache["probs"],                                   
+      129 -        )                                                     
+      107 +        X, Z1, A1, Z2, A2, pred = (cache["X"], cache["Z1"], ca
+          +che["A1"], cache["Z2"], cache["A2"], cache["pred"])           
+      108          N = X.shape[0]
+      109  
+      132 -        # derivative of BCE wrt logits = (probs - y) / N      
+      133 -        dlogits = (probs - y_true) / N  # (N,1)               
+      110 +        # L = sqrt(mean(r^2)) with r = pred - y, so dL/dpred =
+          + r / (N * L)                                                  
+      111 +        residual = pred - y_true                              
+      112 +        rmsle = torch.sqrt(torch.mean(residual**2))           
+      113 +        dpred = residual / (N * (rmsle + 1e-12))  # (N,1); eps
+          + avoids 0/0 on a perfect fit                                  
+      114  
+      115          # W3, b3
+      136 -        dW3 = A2.T @ dlogits                                  
+      137 -        db3 = dlogits.sum(dim=0, keepdim=True)                
+      116 +        dW3 = A2.T @ dpred                                    
+      117 +        db3 = dpred.sum(dim=0, keepdim=True)                  
+      118  
+      119          # backprop to A2
+      140 -        dA2 = dlogits @ self.W3.T                             
+      120 +        dA2 = dpred @ self.W3.T                               
+      121          dZ2 = dA2 * (Z2 > 0).float()
+      122  
+      123          # W2, b2
+
+⏺ Update(ashrae/modeling.py)
+  ⎿  Added 4 lines, removed 3 lines
+      143              self.W3 -= lr * grads["W3"]
+      144              self.b3 -= lr * grads["b3"]
+      145  
+      146 -    def predict(self, X, threshold=0.5):                      
+      147 -        probs, _ = self.forward(X)                            
+      148 -        return (probs > threshold).long().view(-1)            
+      146 +    def predict(self, X):                                     
+      147 +        """log1p predictions, clipped at 0 since readings can'
+          +t be negative."""                                             
+      148 +        pred, _ = self.forward(X)                             
+      149 +        return pred.clamp(min=0).view(-1)                     
+      150  
+      151  class MLP(nn.Module):
+      152      def __init__(self, n_features, batch_norm=False):
+
+⏺ Now I'll check the hand-written gradients against autograd and run a short
+  training loop.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ CustomMLP in modeling.py (ashrae/modeling.py) now trains on RMSLE instead of
+  binary cross-entropy. Its manual gradients match PyTorch's autograd to about
+  2e-7, and a short training run on random data brings the loss down steadily.
+
+  - Output: the sigmoid is gone. The last layer is linear and predicts
+    log1p(reading), like the other models.
+  - loss: sqrt(mean((pred − y)²)), where y_true must already be
+    log1p(meter_reading). That's exactly RMSLE, the same convention as the rest
+    of the project.
+  - backward: the gradient at the output is now (pred − y) / (N · RMSLE),
+    replacing the old cross-entropy gradient. Everything below it is unchanged.
+  - predict: returns log1p predictions clipped at 0. The classification
+    threshold is gone.
+
+  Weights start too large: the weights still start at torch.randn scale, which
+  is much too large for regression on the real 33 features, so the first loss
+  will be huge. I scaled them down by hand for the test. If you plan to train
+  this class on the real data, you probably want He initialization (* sqrt(2 /
+  fan_in)); I can add it.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ change old numbers to new numbers in human_report.md. Flag what phrases
+  should be changed
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Two sentences in human_report.md have old numbers: line 16 (timezone) and line
+  29 (anomalies). I'm updating both.
+
+⏺ Update(human_report.md)
+  ⎿  Added 1 line, removed 1 line
+      13  ### Local time zone correction
+      14  
+      15  As noted in the [competition forum](https://www.kaggle.com/c/as
+          hrae-energy-prediction/discussion/115698), weather
+      16 -timestamps are UTC while meter timestamps are local. We confirm
+         -ed it on our data: after shifting weather by each site's UTC of
+         -fset, temperature peaks at 14:00–16:00 at every site. The excep
+         -tion is site 14, whose meters are in UTC too ([EDA §6.1](eda/ED
+         -A.ipynb#temporal)). The fix improved the LightGBM baseline from
+         - 1.395 to 1.385 ([EDA §6.1](eda/EDA.ipynb#temporal)).          
+      16 +timestamps are UTC while meter timestamps are local. We confirm
+         +ed it on our data: after shifting weather by each site's UTC of
+         +fset, temperature peaks at 14:00–16:00 at every site. The excep
+         +tion is site 14, whose meters are in UTC too ([EDA §6.1](eda/ED
+         +A.ipynb#temporal)). The fix improved the LightGBM baseline from
+         + 1.290 to 1.286 ([EDA §9](eda/EDA.ipynb#broken)).              
+      17  
+      18  ### Remove anomalies
+      19  
+
+⏺ Update(human_report.md)
+  ⎿  Added 1 line, removed 1 line
+      26  We drop them from training data only, while validate on all, be
+          cause kaggle test contains pathological data as well.
+      27  ([data_aggregation.ipynb §4](preprocessing/data_aggregation.ipy
+          nb)).
+      28  
+      29 -With a LightGBM baseline, dropping zero electricity alone impro
+         -ved RMSLE from 1.385 to 1.196, and both rules together to 1.164
+         - ([EDA §9](eda/EDA.ipynb#broken)).                             
+      29 +With a LightGBM baseline, dropping zero electricity alone impro
+         +ved RMSLE on clean rows from 1.140 to 1.061, and both rules tog
+         +ether to 1.048 ([EDA §9](eda/EDA.ipynb#broken)).               
+      30  
+      31  ### Removed features
+      32  
+
+⏺ I updated the two sentences in human_report.md that had old numbers:
+
+  - Line 16 (timezone): now "1.290 to 1.286". I changed the link to EDA §9,
+    because that's where the number is now computed.
+  - Line 29 (anomalies): now "on clean rows from 1.140 to 1.061 … to 1.048". I
+    had to add "on clean rows": these new numbers don't hold on all rows, so
+    without it the sentence would be wrong.
+
+  Phrases I'd change (not edited):
+
+  1. Line 11: "boosted performance of models much more than any other dedicated
+     model engineering" is no longer true.
+     - On all rows, dropping anomalies moves LightGBM only 1.286 → 1.281.
+     - Knowing the building moves the MLP 1.534 → 1.200.
+     - The linked mlp.ipynb Findings no longer say this.
+  2. After line 29: the all-rows result is missing. The average barely changes
+     (1.286 → 1.281). Jul–Dec improves, while Jan–Jun gets worse because broken
+     meters stay broken into the validation months. Without this, the section
+     overstates the gain.
+  3. Line 22: "Other anomalies do not matter so much" now has evidence you can
+     cite. The stuck-meter and spike rules change the score by at most 0.003
+     (EDA §9 (eda/EDA.ipynb#broken)).
+  4. Line 52: "with an RMSE loss" is wrong: the code trains with an MSE loss.
+     Minimizing MSE also minimizes RMSE.
+  5. Line 71: the link [mlp.ipynb, Data] is stale, because mlp.ipynb no longer
+     uses the Jan–Sep / Oct–Dec split. Drop it, or say it was the original
+     setup.
+  6. Line 75: "All tuning notebooks compare models by mean RMSLE over these
+     folds" undersells it. Now every comparison uses the folds, including EDA §9
+     and the model table in mlp.ipynb.
+  7. Line 81: "He initialization did not work" → "made no difference" (1.199 vs
+     1.200, a tie).
+  8. Line 83: this bullet mixes up two findings:
+     - Adversarial validation showed that Oct–Dec differs from Jan–Sep through
+       weather (AUC 0.92).
+     - Jan–Mar being the worst fold came from season_validation, and it's caused
+       by anomalies.
+
+     Also "where" → "were".
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ What's now?
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Most of the flags are fixed: line 11 is reworded, line 52 says MSE, line 75 is
+  simplified, and line 81 says He initialization made no difference. What's
+  left:
+
+  1. Line 11 has two typos: "reslut" and a missing space in "change(". Two more
+     points:
+     - Say "on all rows": on clean rows the gain is large (1.140 → 1.048), so
+       "slight change" is only true for the Kaggle score.
+     - The numbers behind this claim are in EDA §9, so EDA §9
+       (eda/EDA.ipynb#broken) is a better link than mlp.ipynb Findings.
+  2. Line 71: the ([mlp.ipynb, Data](models/mlp.ipynb)) link is still stale,
+     since mlp.ipynb now uses the folds. There's also a grammar slip: "these the
+     two parts" should be "the two parts".
+  3. Line 83 still credits adversarial validation with the Jan–Mar finding.
+     Adversarial validation showed that a single Oct–Dec split tests only one
+     season (AUC 0.92, from weather). Jan–Mar being the hardest fold came from
+     season_validation and is caused by anomalies. Also "where" → "were".
+  4. Optional, line 22: "Other anomalies do not matter so much" could cite the
+     evidence. On top of the two rules, the stuck-meter and spike rules change
+     the score by 0.003 at most (EDA §9 (eda/EDA.ipynb#broken)).
+
+  Small typos:
+  - line 20: "constanst" → "constant";
+  - line 41: "liearly" → "linearly";
+  - line 42: "than interpolated" → "then interpolated";
+  - line 53: "which generally good sign" → "which is generally a good sign".
+
+  Want me to fix these?
+
+❯ I have more general question now: is not it better train deep learning model
+  on more layers in this project?
+
+⏺ Probably a bit, but more layers isn't the biggest lever here. Your own results
+  say the model is under-fitting, not over-fitting:
+
+  - Training error is high. Training RMSLE is 0.83 and clean validation is 0.94,
+    so the model can't fit even the training data well.
+  - Regularization only made validation worse.
+  - Validation was still improving at epoch 20.
+
+  So more capacity has room to help. Still, only about 0.11 of the gap is left
+  for a bigger model to close. The larger 0.26 is anomaly rows in validation,
+  and no architecture can predict those.
+
+  On tabular data, going wider (128–256 units, or a larger building embedding)
+  usually helps more than going deeper. Past 3–4 layers the gains tend to fade.
+  Two cheaper levers may matter as much:
+
+  - More training rows: each fold uses 2M of the ~19M available.
+  - Longer training.
+
+  I'd run one quick 4-fold sweep before changing anything: depth 2 vs 3 vs 4 ×
+  width 64 vs 128 vs 256, plus a 4M-row variant. At about 0.4 minutes per fold,
+  that's roughly 40 minutes, and the numbers would show whether capacity or data
+  is the limit. Want me to set it up?
+
+❯ What do you mean by "regularization only made worse" if I did not make
+  regularization
+
+⏺ I meant the experiments in regularization_test.ipynb
+  (models/regularization_test.ipynb), not the final model. You're right that the
+  submitted model uses no regularization. That notebook tested whether adding
+  some would help mlp_4out_emb, on the 4 folds:
+
+  ┌─────────────────────────────────────────────┬──────────────────┐
+  │                    Setup                    │ Validation RMSLE │
+  ├─────────────────────────────────────────────┼──────────────────┤
+  │ none (the final model)                      │ 1.200            │
+  ├─────────────────────────────────────────────┼──────────────────┤
+  │ weight decay 0.01 / 0.1                     │ 1.200 / 1.202    │
+  ├─────────────────────────────────────────────┼──────────────────┤
+  │ dropout 0.2                                 │ 1.208            │
+  ├─────────────────────────────────────────────┼──────────────────┤
+  │ smaller embedding (4 numbers instead of 16) │ 1.209            │
+  ├─────────────────────────────────────────────┼──────────────────┤
+  │ all three together                          │ 1.231            │
+  └─────────────────────────────────────────────┴──────────────────┘
+
+  Nothing beat "none", so no regularization went into the final model. That's
+  the relevant evidence for the depth question. If the model were over-fitting,
+  these would have improved validation. They didn't, and dropout mostly just
+  raised training error (0.83 → 0.97). So the model is capacity- or
+  data-limited, not memorizing, and that's why a wider or deeper network is
+  worth a try.
+
+❯ Create file "layers_test" where train mlp_4out_emb and mlp_4out_mean on 20
+  epochs for purposed layers depth.
+
+⏺ I'll read the current modeling.py first, since it changed on disk. MeterMLP
+  needs a depth option before the notebook can vary it.
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+⏺ I'm adding an n_layers option (default 2, so every existing notebook behaves
+  the same).
+
+⏺ Update(ashrae/modeling.py)  ⎿  Added 3 lines, removed 3 lines
+      51      )
+      52  
+      53  
+      54 -def hidden_layers(n_in, batch_norm=True, dropout=0.0):         
+      55 -    """Two hidden layers of 64 units; dropout goes after BatchN
+         -orm and ReLU."""                                               
+      54 +def hidden_layers(n_in, batch_norm=True, dropout=0.0, n_layers=
+         +2):                                                            
+      55 +    """`n_layers` hidden layers of 64 units; dropout goes after
+         + BatchNorm and ReLU."""                                        
+      56      block = lambda n: [nn.Linear(n, 64), *([nn.BatchNorm1d(64)]
+           if batch_norm else []), nn.ReLU(),
+      57                         *([nn.Dropout(dropout)] if dropout else 
+          [])]
+      58 -    return nn.Sequential(*block(n_in), *block(64))             
+      58 +    return nn.Sequential(*block(n_in), *[m for _ in range(n_lay
+         +ers - 1) for m in block(64)])                                  
+      59  
+      60  
+      61  def sigmoid(x):
+
+⏺ Update(ashrae/modeling.py)
+  ⎿  Added 2 lines, removed 2 lines
+      154      """One output per meter type; with `n_buildings`, a learne
+           d `emb_dim`-number vector per building is added to
+      155      the input."""
+      156  
+      157 -    def __init__(self, n_features, n_buildings=0, emb_dim=16, 
+          -dropout=0.0):                                                 
+      157 +    def __init__(self, n_features, n_buildings=0, emb_dim=16, 
+          +dropout=0.0, n_layers=2):                                     
+      158          super().__init__()
+      159          self.emb = nn.Embedding(n_buildings, emb_dim) if n_bui
+           ldings else None
+      160 -        self.hidden = hidden_layers(n_features + (emb_dim if n
+          -_buildings else 0), dropout=dropout)                          
+      160 +        self.hidden = hidden_layers(n_features + (emb_dim if n
+          +_buildings else 0), dropout=dropout, n_layers=n_layers)       
+      161          self.out = nn.Linear(64, len(METERS))
+      162  
+      163      def forward(self, x, meter, building):
+
+⏺ Now the notebook. It trains 2 models × 3 depths (2, 3, 4 hidden layers of 64)
+  × 4 folds, 20 epochs each, using the same folds and row samples as the other
+  notebooks.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Before the long run, a quick check that the default depth is unchanged and
+  that the results-table code works.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Both checks pass. Running the notebook now (24 runs, about 20 minutes).
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+⏺ Background command "Execute layers_test notebook" completed (exit code 0)
+
+⏺ Background command "Wait for layers_test to finish" completed (exit code 0)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Results are in. Writing the findings into the notebook.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ I created models/layers_test.ipynb and ran it. Adding layers doesn't help the
+  model you submit, so it stays at 2. It trains mlp_4out_emb and mlp_4out_mean
+  with 2, 3 and 4 hidden layers, 20 epochs each, on the same 4 folds as the
+  other notebooks.
+
+  Fold average at epoch 20, all rows:
+
+  ┌───────────────┬──────────────┬───────────────────────────────┐
+  │ Hidden layers │ mlp_4out_emb │         mlp_4out_mean         │
+  ├───────────────┼──────────────┼───────────────────────────────┤
+  │ 2 (current)   │ 1.188        │ 1.236                         │
+  ├───────────────┼──────────────┼───────────────────────────────┤
+  │ 3             │ 1.192        │ 1.225                         │
+  ├───────────────┼──────────────┼───────────────────────────────┤
+  │ 4             │ 1.192        │ 1.222 (better in all 4 folds) │
+  └───────────────┴──────────────┴───────────────────────────────┘
+
+  - Embedding model: deeper networks fit the training rows slightly better
+    (0.806 → 0.792) and learn faster in the first few epochs, but end at the
+    same validation score.
+  - Series-mean model: 4 layers passes the rule I wrote into the notebook before
+    running (more than 0.01 better, and better in at least 3 of 4 folds). It
+    still loses to the 2-layer embedding model (1.222 vs 1.188).
+
+  The extra layers help the mean model because it knows only one number per
+  building, and depth partly makes up for that. The embedding already gives the
+  network 16 learned numbers per building, so extra depth adds nothing. The
+  remaining error comes mostly from anomaly rows and the season, not from model
+  size. More training rows (currently 2M of about 19M per fold) are the more
+  promising thing to try next.
+
+  To make depth configurable, I added an n_layers option to MeterMLP in
+  modeling.py (ashrae/modeling.py). It defaults to 2, and I checked that the
+  default builds exactly the same network as before, so the other notebooks
+  aren't affected.
+
+  I haven't added this result to the AI report or to the follow-up table in
+  mlp.ipynb.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ Make step by step guide on how to push this project on github. I want to push
+  only Homework 1
+
+⏺ I'll check a few things that affect the guide first: file sizes (GitHub
+  rejects files over 100 MB), the current git setup, and any links that point
+  outside the folder.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Here's the plan. I checked your setup, and three things shape it:
+
+  - Your course folder is already a git repo, pointing at the course's own repo
+    (AI301-Deep-Learning/kse_deep_learning). You shouldn't push there, so
+    Homework 1 becomes a separate repo.
+  - data/ is 4.6 GB, with files up to 1.4 GB. GitHub rejects files over 100 MB,
+    so the data stays out.
+  - Some links point outside the folder, to ../../Development Guide and
+    ../../../Module_1. They'll be broken on GitHub.
+
+  1. Create an empty repo on GitHub
+
+  On github.com, click New repository. Name it, e.g. ashrae-energy-mlp, and
+  leave "Add README / .gitignore / license" unchecked. Keep the page open;
+  you'll need its SSH URL (git@github.com:<you>/ashrae-energy-mlp.git).
+
+  2. Keep the course repo from picking up this folder
+
+  cd "/Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning Course"
+  echo "Homeworks/Homework 1/" >> .git/info/exclude
+
+  This makes the course repo ignore the folder, only on your machine, so the two
+  repos don't get tangled.
+
+  3. Add a .gitignore inside Homework 1
+
+  Create Homeworks/Homework 1/.gitignore with:
+
+  data/
+  __pycache__/
+  .ipynb_checkpoints/
+  .DS_Store
+  mlruns/
+
+  Decide on mlflow.db (5 MB): keep it if you want readers to browse your runs
+  with mlflow ui. Add it to .gitignore if not.
+
+  4. Add a dependency list
+
+  The notebooks rely on the course's Poetry environment, which won't be in this
+  repo. From the course folder, run:
+
+  poetry run pip freeze | grep -iE "^(numpy|pandas|torch|lightning|torchmetrics|
+  scikit-learn|lightgbm|mlflow|matplotlib|seaborn|pyarrow|jupyterlab)==" >
+  "Homeworks/Homework 1/requirements.txt"
+
+  5. Add a short README
+
+  It should say what the project is, and link AI_Report.md and human_report.md.
+  It should also say how to get the data: download it from the Kaggle ASHRAE
+  competition (kaggle competitions download -c ashrae-energy-prediction) into
+  data/, then run preprocessing/data_aggregation.ipynb first.
+
+  6. Initialize, check, commit
+
+  cd "/Users/lupaskodmitro/FuckIT/Machine Learning/Deep Learning
+  Course/Homeworks/Homework 1"
+  git init -b main
+  git add .
+  git status          # check: no data/, no .csv or .parquet files
+  du -sh .git         # should be a few MB
+  git commit -m "ASHRAE energy prediction: EDA, MLP models, 4-fold validation"
+
+  If git status shows anything under data/, stop and fix .gitignore before you
+  commit. A large file in the history is painful to remove.
+
+  7. Push
+
+  git remote add origin git@github.com:<you>/ashrae-energy-mlp.git
+  git push -u origin main
+
+  This uses SSH, and your SSH key already works with GitHub (your course repo
+  uses it).
+
+  Before you push
+
+  - Broken links: AI_Report.md and the mlp, optimizers, regularization and EDA
+    notebooks link to ../../Development Guide/... or ../../../Module_1/....
+    Remove those links, or copy the guides into the repo.
+  - Local paths in outputs: some notebook outputs show your local path
+    (/Users/lupaskodmitro/...), e.g. the MLflow lines. It's harmless, but
+    visible.
+  - Public or private: a private repo is the safe default for coursework, unless
+    you're meant to share it.
+
+  I can do steps 3–5 for you (.gitignore, requirements.txt, README.md, and
+  fixing the outside links). Those are local file changes; the commit and push
+  are yours.
+
+❯ <ide_opened_file>The user opened the file /Users/lupaskodmitro/FuckIT/Machine
+  Learning/Deep Learning Course/Homeworks/Homework 1/human_report.md in the
+  IDE. This may or may not be related to the current task.</ide_opened_file>
+
+❯ But I have git repository on the whole deep learning course now
+
+⏺ I'll check who owns that course repo and what's committed there, since that
+  decides which option fits.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ That repo is a clone of the instructors' course repo, not your own:
+
+  - Remote: origin is AI301-Deep-Learning/kse_deep_learning, the course
+    organization's repo.
+  - History: every commit is by the instructors (Volodymyr Sydorskyi, Anton
+    Bazdyrev); there are none of yours.
+  - Your work so far exists only locally and isn't committed: Homework 1 is
+    untracked, and your Development Guide files and lecture notebook edits are
+    either staged or modified.
+
+  So a git push from there would try to put your homework into the shared course
+  repo. You probably don't have write access; if you did, every student would
+  see it. That's why I suggested a separate repo. The two coexist without
+  problems: the course clone keeps pulling lecture updates from origin, and
+  Homework 1 has its own .git inside it. Step 2 of the guide keeps the course
+  repo from picking up the folder.
+
+  If you'd rather have everything in one repo of your own (lectures plus
+  homework), you could add your own GitHub repo as a second remote next to
+  origin and push there. But that pushes the whole course, instructors' history
+  included, which isn't "only Homework 1".
+
+  I'd stick with the separate repo from the guide. One note: git status shows
+  your course clone is 1 commit behind origin/main. Pulling that update later
+  won't affect the Homework 1 repo.
+
+❯ okay, let's just push it fully for now
+
+⏺ Before committing anything, I'll check the whole course folder for files
+  GitHub would reject.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ The size check is fine: the course .gitignore already excludes the 4.6 GB
+  data/ folder, so a commit would be 37 files, about 11 MB. One thing I need
+  from you before pushing:
+
+⏺ User answered Claude's questions:
+  ⎿  · Where should the whole course repo be pushed? Right now `origin` is the
+     instructors' shared repo (AI301-Deep-Learning/kse_deep_learning). → My own
+     new GitHub repo (Recommended)
+     · What should the commit include? → Everything changed (Recommended)
+
+⏺ I'm staging everything except .DS_Store files (macOS junk, which I'm adding to
+  this clone's local exclude list), then reviewing what would be committed.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Staged: 35 files, and no data files. There's a failure_report.md I hadn't seen
+  before; I'm including it as your file. Next, a quick scan of the staged
+  changes for anything that looks like a secret.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ No secrets: the only matches are package names in poetry.lock. Committing now.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Everything is committed locally as 999c3ea, and the working tree is clean.
+  Nothing has been pushed yet, because I still need the address of your own
+  GitHub repo.
+
+  To finish:
+
+  1. On github.com, create a new empty repository. Leave README, .gitignore and
+     license unchecked, and making it private is the safe default for
+     coursework.
+  2. Paste its SSH URL here (it looks like git@github.com:<you>/<name>.git).
+
+  I'll then run:
+
+  git remote add mine <your URL>
+  git push -u mine main
+
+  origin stays as it is, so you can keep pulling lecture updates from the
+  instructors. Those pulls will now also require a merge, because your clone is
+  one commit behind origin/main.
+
+❯ Explain how mlp 4out embening model is designed: what it takes as input, what
+  it outputs
+
+⏺ mlp_4out_emb is MeterMLP(n_features=33, n_buildings=1449) in modeling.py
+  (ashrae/modeling.py). It predicts one row, meaning one building × one meter ×
+  one hour.
+
+  Input: three things per row
+
+  1. x: 33 numbers, built by build_features in features.py (ashrae/features.py)
+     and standardized with a scaler fitted on the training rows:
+
+  | Group        | Features
+                                  | Count |
+  |--------------|--------------------------------------------------------------
+  ---------------------------------|-------|
+  | Building     | log1p(square_feet), year_built (filled with the training
+  median), a "year_built missing" flag | 3     |
+  | Weather      | air temperature, dew temperature, sea-level pressure, wind
+  speed, wind direction as sin/cos   | 6     |
+  | Time (local) | hour sin/cos, day of week sin/cos
+                                  | 4     |
+  | Meter type   | one-hot: electricity, chilled water, steam, hot water
+                                  | 4     |
+  | Building use | one-hot primary_use (Education, Office, …)
+                                  | 16    |
+
+  2. building: the building id (0–1448), used to look up that building's
+     embedding.
+  3. meter: the meter type (0–3), used to pick which output to keep.
+
+  Inside
+
+  building id ──► Embedding(1449 × 16) ──► 16 learned numbers ─┐
+                                                               ├─► concat: 49
+  numbers
+  x (33 features) ─────────────────────────────────────────────┘
+        │
+        ▼
+  Linear 49→64 ─► BatchNorm ─► ReLU
+  Linear 64→64 ─► BatchNorm ─► ReLU
+  Linear 64→4    (one output per meter type)
+        │
+        ▼
+  keep the output of the row's own meter ─► 1 number
+
+  - The embedding is a learned table with 16 numbers per building. It starts
+    random and is trained with the rest of the network. It lets the model learn
+    what size, use and weather can't explain: why two similar buildings differ
+    in consumption by orders of magnitude, and how each one reacts to weather.
+    It holds 23,184 of the model's 31,060 parameters.
+  - The 4 outputs give each meter type its own final layer on top of shared
+    hidden layers. Heating and cooling react to temperature in opposite
+    directions, so they need separate outputs. Each row trains only the output
+    of its own meter (gather).
+  - The meter type goes in twice: as the one-hot in x, so the hidden layers know
+    it, and as the index that picks the output.
+
+  Output
+
+  One number per row: the predicted log1p(meter_reading).
+
+  - Training: MSE between this number and the true log1p(reading), which is
+    exactly RMSLE squared.
+  - Validation: negative predictions are clipped to 0, since readings can't be
+    negative.
+  - Submission: expm1 turns it back into a reading. Site 0 electricity is then
+    converted back from kWh to kBTU, the unit Kaggle scores it in.
+
+  A building the model never saw in training would keep its random, untrained
+  embedding. That doesn't happen here, since all 1,449 buildings appear in 2016.
+❯ create ensemble.ipynb where ensemble mlp_4out_emb and lgbm. provide
+  reccomendation (dta size, tuning, etc)
+
+⏺ I'll put models/ensemble.ipynb on the same 4 folds as everything else, so its
+  scores are directly comparable. Here's what goes into it:
+
+  - Models, per fold: mlp_4out_emb (the final configuration, 20 epochs), the
+    current LightGBM, and a LightGBM that also gets building_id as a categorical
+    feature. Right now LightGBM doesn't know which building a row is, which is
+    the MLP's biggest advantage.
+  - Blend: a weighted average in log1p space. The weight is chosen on 3 folds
+    and scored on the 4th, so the ensemble score isn't tuned on its own
+    validation rows.
+  - Evidence for the recommendations: how correlated the two models' errors are,
+    per-meter results, and a 2M vs 4M training-rows check.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Before the ~40-minute run, a quick smoke test: the same notebook with tiny row
+  counts and 1 epoch, written to the scratchpad.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ The smoke test runs end to end. Two cleanups: I'm fixing how the chosen
+  weights print (np.float64(0.05) → 0.05), and removing the smoke-test runs from
+  MLflow. Then the real run starts.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+⏺ The smoke runs are gone for good. Starting the full run now (about 40
+  minutes).
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+⏺ Background command "Execute ensemble notebook" completed (exit code 0)
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+⏺ The results are in. Writing the findings and recommendations into the
+  notebook.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ Background command "Wait for ensemble notebook" completed (exit code 0)
+
+⏺ I created models/ensemble.ipynb and ran it on the same 4 folds as the other
+  notebooks. The best blend is 0.65 · MLP + 0.35 · LightGBM-with-building-id,
+  which improves the MLP by a small amount (0.009) in every fold.
+
+  Fold average (all rows); the blend weight was chosen on 3 folds and scored on
+  the 4th:
+
+  ┌───────────────────────────────┬──────────┬────────────┐
+  │             Model             │ All rows │ Clean rows │
+  ├───────────────────────────────┼──────────┼────────────┤
+  │ mlp_4out_emb                  │ 1.187    │ 0.924      │
+  ├───────────────────────────────┼──────────┼────────────┤
+  │ lgbm (current)                │ 1.280    │ 1.045      │
+  ├───────────────────────────────┼──────────┼────────────┤
+  │ lgbm + building_id            │ 1.217    │ 0.959      │
+  ├───────────────────────────────┼──────────┼────────────┤
+  │ blend with lgbm               │ 1.183    │ 0.919      │
+  ├───────────────────────────────┼──────────┼────────────┤
+  │ blend with lgbm + building_id │ 1.178    │ 0.911      │
+  └───────────────────────────────┴──────────┴────────────┘
+
+  - Why the gain is small: the MLP's and LightGBM's errors are strongly
+    correlated (0.88). The blend helps chilled water, steam and hot water, but
+    not electricity.
+  - The building feature matters: telling LightGBM which building a row is
+    improves it by 0.063, the largest change in this notebook. It's still behind
+    the MLP.
+  - More data doesn't help: 4M training rows instead of 2M changes every model
+    by at most 0.002. That contradicts what I suggested earlier, when I said
+    more rows might be the more promising lever.
+
+  The recommendations section of the notebook covers:
+
+  1. Submit the blend: 0.65 · MLP + 0.35 · lgbm with building_id, both retrained
+     on all of 2016, and check it on the leaderboard.
+  2. Data size: keep 2M rows per fold for experiments. For the final models,
+     train on all of 2016 anyway, since it's a one-off cost.
+  3. Tune LightGBM next: a lower learning rate with early stopping, and
+     num_leaves 31–255. Do it in a notebook without torch, so LightGBM can use
+     all cores; here it's limited to one thread.
+  4. MLP: the only open direction is 30–40 epochs or a learning-rate schedule.
+     More layers, regularization and more rows didn't help.
+  5. For a bigger ensemble gain, add models that make different errors: averaged
+     MLP seeds, per-meter weights (validated the same way), or lagged/rolling
+     weather features. All untested.
+
+  I haven't changed the submission. It's still the MLP alone. Building the
+  blended submission means retraining both models on all of 2016; I can add that
+  to mlp.ipynb if you want it.
+
+❯ in submission ipynb blend models as stated in ensemble, and produce
+  submission file based on 2M rows
+
+⏺ I'll check whether a submission notebook already exists.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ I'll create models/submission.ipynb, training both models on 2M clean rows
+  sampled from all of 2016 (matching the ensemble's validation size), then blend
+  their log1p predictions (0.65 MLP + 0.35 LightGBM-with-building-id) and write
+  the result to data/processed/submission_blend.csv.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+⏺ One fix before running: the training-score print should use the run id that
+  fit returns, not mlp.logger.
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+⏺ I created models/submission.ipynb, ran it, and it wrote
+  data/processed/submission_blend.csv: 41,697,600 rows, matching Kaggle's
+  sample_submission.csv.
+
+  It does four things:
+  - Samples 2M training rows from all of 2016 without anomalies (143K–175K per
+    month).
+  - Trains mlp_4out_emb (20 epochs, training RMSLE 0.819) and LightGBM with
+    building_id as a categorical feature, using the same settings as the
+    ensemble.
+  - Blends the test predictions as 0.65 · MLP + 0.35 · LightGBM in log1p space,
+    turns them back into readings with expm1, and converts site 0 electricity
+    back to kBTU.
+  - Checks before saving that the row ids match the sample submission and that
+    every value is finite and not negative.
+
+  The two models' test predictions correlate at 0.976 and have almost the same
+  mean. That's what you'd expect, since their fold errors were already very
+  similar.
+
+  - Compared with submission_mlp.csv: that file (from mlp.ipynb) was trained on
+    4M rows. The two differ in both blending and training size, though
+    ensemble.ipynb found that 4M rows made no difference.
+  - Upload: the CSV is 713 MB, so compress it first; Kaggle accepts .zip and
+    .gz. Uploading both files gives you the first leaderboard check of whether
+    the fold validation tracks the test years.
+
+  The notebook doesn't record a leaderboard score yet.
+
+⏺ Background command "Wait for submission notebook" completed (exit code 0)
+
+⏺ That notification was just the leftover wait command finishing, so nothing
+  changes. The submission file is ready.
